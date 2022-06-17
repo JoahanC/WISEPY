@@ -1,12 +1,19 @@
 #!/usr/bin/env python
 # coding: utf-8
+
+# In[3]:
+
+
 import csv 
 import math
 from astropy.time import Time
 import pandas as pd
 import numpy as np
 
+
 # Utility functions
+
+# In[4]:
 
 
 def decimal_day_converter(dec_day):
@@ -31,13 +38,22 @@ def decimal_day_converter(dec_day):
     return 'T' + hours_str + ':' + mins_str + ':' + secs_str
 
 
-def MPC_parser(mpc_file):
+def n_round(x, n):
     """
-    Parses through the MPC datafile for a given object.
-    Arguments: mpc_file (str) --  The file containing the relevant data
-    Returns: (Np.Array) -- An array of date values for individual observations. 
+    Rounds a float to the nearest n integer
+    Arguments: x (float) -- number being rounded
+               n (int) -- number rounding to
+    Returns: (int) -- rounded number
     """
+    return base * round(x/base)
 
+
+# MPC data reading
+
+# In[5]:
+
+
+def MPC_parser(mpc_file):
     read_file = pd.read_csv(mpc_file)
     read_file.to_csv ('mpc_file.csv', index=None)
     csv_url = 'mpc_file.csv'
@@ -64,14 +80,14 @@ def MPC_parser(mpc_file):
     return dates
 
 
+# WISE data reading
+
+# In[6]:
+
+
 from pandas import *
 def WISE_parser(wise_file):
-    """
-    Parses through the WISE datafile for a given object.
-    Arguments: wise_file (str) -- The file containing the relevant data
-    Returns: (Np.Array) -- An array of data values for individual observations.
-    """
- 
+    
     data = read_csv(wise_file) 
     #setting up chart of data
     mjd = data['mjd']
@@ -94,11 +110,18 @@ def WISE_parser(wise_file):
     return modified_time
 
 
+# Rounding utility function
+
+# In[7]:
+
+
 def base_round(x, base=5):
     return base * round(x/base)
 
 
 # Comparison function between MPC and WISE catalog
+
+# In[10]:
 
 
 def comparison(mpc_file, wise_file):
@@ -110,7 +133,7 @@ def comparison(mpc_file, wise_file):
     
     mpc_data = MPC_parser(mpc_file)
     wise_data = WISE_parser(wise_file)
-    print("Raw Data \n")
+    print("-------------Database Statistics \n")
     print("Epochs observed in the MPC database:", len(mpc_data))
     print("Epochs observed in the WISE database:", len(wise_data))
     
@@ -124,11 +147,10 @@ def comparison(mpc_file, wise_file):
             wise_years.append(year)
     for datum in mpc_data:
         year = int(datum[:4])
-        if year in wise_years:
-            trimmed_mpc_data.append(datum)
+        #if year in wise_years:
+        #    trimmed_mpc_data.append(datum)
         if year not in mpc_years:
             mpc_years.append(year)
-    trimmed_mpc_data = np.array(trimmed_mpc_data)
     
     wise_years_str = ""
     for year in wise_years:
@@ -138,13 +160,11 @@ def comparison(mpc_file, wise_file):
     for year in mpc_years:
         mpc_years_str += str(year) + ", "
     print("Years in which MPC data was collected: " + mpc_years_str[:-2])
-    
-    print("Epochs observed in trimmed MPC database:", len(trimmed_mpc_data))
-    
+        
     # Comparison sort
     rounded_mpc_data = []
     rounded_wise_data = []
-    for datum in trimmed_mpc_data:
+    for datum in mpc_data:
         pre_seconds = datum[:17]
         seconds = str(base_round(float(datum[17:]))).zfill(2)
         rounded_mpc_data.append(pre_seconds + seconds)
@@ -159,9 +179,12 @@ def comparison(mpc_file, wise_file):
     return rounded_mpc_data, rounded_wise_data, new_epochs
 
 
-# Testing values 
+# In[11]:
+
+
 mpc_data = '161989.txt'
 wise_data = 'table_irsa_catalog_search_results-2.csv'
 mpc_data, wise_data, new_epochs = comparison(mpc_data, wise_data)
 #print(mpc_data)
 #print(wise_data)
+
