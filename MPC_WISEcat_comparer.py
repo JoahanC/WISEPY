@@ -4,6 +4,7 @@ from astropy.time import Time
 from astropy.table import Table
 import pandas as pd
 import numpy as np
+from numpy import source
 
 
 def decimal_day_converter(dec_day):
@@ -61,33 +62,25 @@ def MPC_parser(mpc_file):
             day = day[:2]
             date = year+'-'+month+'-'+day+time_string
             dates.append(date[:23])
-    dates = np.array(dates)
+    utc_dates = np.array(dates)
     return dates
 
 
-from pandas import *
 def WISE_parser(wise_file):
     
-    data = read_csv(wise_file) 
-    #setting up chart of data
-    mjd = data['mjd']
-    mjd_list = []
-    for i in range(134):
-        mjd_list.append(str(mjd[i]))
-    #print(mjd_list)
-    #Converting MJD to UTC
-    times = mjd_list
-    t = Time(times, format='mjd', scale='utc')
+    data_object = Table.read(wise_file, format='ipac')
+    dates = list(data_object['mjd'])
+    source_ids = list(data_object['source_id'])
 
-    #t.scale = 'utc'
-    modified_time = t.isot
-    #print(modified_time)
+    time_object = Time(dates, format='mjd', scale='utc')
+    julian_dates = time_object.jd
+    utc_dates = time_object.utc
 
-    #Adding UTC times to a dictionary
-    Obs_Dates_dict = {}
-    #adding mjd to dictionary
-    Obs_Dates_dict["23606 1996 AS1"] = modified_time
-    return modified_time
+    images = {}
+    for id in source_ids:
+        images[id] = [julian_dates, utc_dates]
+
+    return images
 
 
 def base_round(x, base=5):
@@ -130,7 +123,7 @@ def comparison(mpc_file, wise_file):
     for year in mpc_years:
         mpc_years_str += str(year) + ", "
     print("Years in which MPC data was collected: " + mpc_years_str[:-2])
-        
+    
     # Comparison sort
     rounded_mpc_data = []
     rounded_wise_data = []
