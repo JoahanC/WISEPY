@@ -81,9 +81,9 @@ def WISE_parser(wise_file):
     and jd time values.
     
     Arguments: wise_file (str) -- a path to the data file to read from.
-    Returns: (dict) -- the keys correspond to the source ids for each image,
-    a list is returned for each key where [0] corresponds to jd and [1]
-    corresponds to utc.
+    Returns: (dict) -- the keys correspond to the utc dates for each image,
+    a list is returned for each key where [0] corresponds to source_id and [1]
+    corresponds to julian dates.
     """
 
     data_object = Table.read(wise_file, format='ipac')
@@ -95,9 +95,8 @@ def WISE_parser(wise_file):
     utc_dates = time_object.isot
 
     images = {}
-    for idx, id in enumerate(source_ids):
-        images[id] = [julian_dates[idx], utc_dates[idx]]
-
+    for idx, date in enumerate(utc_dates):
+        images[str(date)] = [source_ids[idx], julian_dates[idx]]
     return images
 
 def n_round(x, n=5):
@@ -110,31 +109,29 @@ def n_round(x, n=5):
     return n * round(x/n)
 
 
-def comparison(mpc_file, wise_file):
+def data_comparer(mpc_file, wise_file):
     """
     Compares the observational instances between the MPC and WISE dataset files for a given object. ds
-    Arguments: mpc_file: txt file which contains MPC data
-                wise_file: file which contains WISE
+    Arguments: mpc_file (str) -- txt file which contains MPC data
+               wise_file (str) -- file which contains WISE
     """
     
-    mpc_data = MPC_parser(mpc_file)
-    wise_data = WISE_parser(wise_file)
-    print("-------------Database Statistics \n")
-    print("Epochs observed in the MPC database:", len(mpc_data))
-    print("Epochs observed in the WISE database:", len(wise_data))
+    mpc_observation_data = MPC_parser(mpc_file)
+    wise_image_data = WISE_parser(wise_file)
+    print("-------------Database Statistics---------------- \n")
+    print("Epochs observed in the MPC database:", len(mpc_observation_data))
+    print("Epochs observed in the WISE database:", len(wise_image_data))
     
-    # Year trim
+    # Year Counting
     wise_years = []
     mpc_years = []
-    trimmed_mpc_data = []
-    for datum in wise_data:
+    for datum in wise_image_data:
+        print(datum)
         year = int(datum[:4])
         if year not in wise_years:
             wise_years.append(year)
-    for datum in mpc_data:
+    for datum in mpc_observation_data:
         year = int(datum[:4])
-        #if year in wise_years:
-        #    trimmed_mpc_data.append(datum)
         if year not in mpc_years:
             mpc_years.append(year)
     
@@ -147,23 +144,32 @@ def comparison(mpc_file, wise_file):
         mpc_years_str += str(year) + ", "
     print("Years in which MPC data was collected: " + mpc_years_str[:-2])
     
+    # Acquire utc dates
+    wise_utc = list(wise_image_data.keys())
+    mpc_utc = list(mpc_observation_data.keys())
+
     # Comparison sort
     rounded_mpc_data = []
-    rounded_wise_data = []
-    for datum in mpc_data:
+    rounded_wise_data = {}
+    for datum in mpc_utc:
         pre_seconds = datum[:17]
         seconds = str(n_round(float(datum[17:]))).zfill(2)
         rounded_mpc_data.append(pre_seconds + seconds)
         
-    for datum in wise_data:
+    for datum in wise_utc:
         pre_seconds = datum[:17]
         seconds = str(n_round(float(datum[17:]))).zfill(2)
-        rounded_wise_data.append(pre_seconds + seconds)
+        rounded = pre_seconds + seconds
+        rounded_wise_data[rounded] = datum
+
+    new_epochs = np.array([epoch for epoch in rounded_wise_data.keys() if epoch not in rounded_mpc_data])
+    new_epoch_ids = []
+    for epoch in new_epochs:
+        new_epoch_ids.append(wise_image_data[rounded_wise_data[epoch]][0])
     
-    new_epochs = np.array([epoch for epoch in rounded_wise_data if epoch not in rounded_mpc_data])
     print("New epochs observed in WISE catalog:", len(new_epochs))
-    return rounded_mpc_data, rounded_wise_data, new_epochs
+    unique_epochs = {}
+    for idx, id in enumerate(new_epoch_ids):
+        unique_epochs[id] = new_epochs[idx]
 
-
-
-
+    return unique_epochs
