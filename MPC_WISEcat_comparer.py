@@ -29,16 +29,6 @@ def decimal_day_converter(dec_day):
     return 'T' + hours_str + ':' + mins_str + ':' + secs_str
 
 
-def n_round(x, n):
-    """
-    Rounds a float to the nearest n integer
-    Arguments: x (float) -- number being rounded
-               n (int) -- number rounding to
-    Returns: (int) -- rounded number
-    """
-    return base * round(x/base)
-
-
 def MPC_parser(mpc_file):
     read_file = pd.read_csv(mpc_file)
     read_file.to_csv ('mpc_file.csv', index=None)
@@ -67,24 +57,37 @@ def MPC_parser(mpc_file):
 
 
 def WISE_parser(wise_file):
+    """
+    Parses a tbl file containing WISE image data that returns source ids, utc,
+    and jd time values.
     
+    Arguments: wise_file (str) -- a path to the data file to read from.
+    Returns: (dict) -- the keys correspond to the source ids for each image,
+    a list is returned for each key where [0] corresponds to jd and [1]
+    corresponds to utc.
+    """
     data_object = Table.read(wise_file, format='ipac')
     dates = list(data_object['mjd'])
     source_ids = list(data_object['source_id'])
 
     time_object = Time(dates, format='mjd', scale='utc')
     julian_dates = time_object.jd
-    utc_dates = time_object.utc
+    utc_dates = time_object.isot
 
     images = {}
-    for id in source_ids:
-        images[id] = [julian_dates, utc_dates]
+    for idx, id in enumerate(source_ids):
+        images[id] = [julian_dates[idx], utc_dates[idx]]
 
     return images
 
-
-def base_round(x, base=5):
-    return base * round(x/base)
+def n_round(x, n=5):
+    """
+    Rounds a float to the nearest n integer.
+    Arguments: x (float) -- the number being rounded.
+               n (int) -- the number being rounded to.
+    Returns: (int) -- the rounded integer.
+    """
+    return n * round(x/n)
 
 
 def comparison(mpc_file, wise_file):
@@ -129,12 +132,12 @@ def comparison(mpc_file, wise_file):
     rounded_wise_data = []
     for datum in mpc_data:
         pre_seconds = datum[:17]
-        seconds = str(base_round(float(datum[17:]))).zfill(2)
+        seconds = str(n_round(float(datum[17:]))).zfill(2)
         rounded_mpc_data.append(pre_seconds + seconds)
         
     for datum in wise_data:
         pre_seconds = datum[:17]
-        seconds = str(base_round(float(datum[17:]))).zfill(2)
+        seconds = str(n_round(float(datum[17:]))).zfill(2)
         rounded_wise_data.append(pre_seconds + seconds)
     
     new_epochs = np.array([epoch for epoch in rounded_wise_data if epoch not in rounded_mpc_data])
