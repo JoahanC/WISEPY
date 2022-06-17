@@ -31,11 +31,22 @@ def decimal_day_converter(dec_day):
 
 
 def MPC_parser(mpc_file):
+    """
+    Parses a txt file containing MPC data that returns utc and jd time values.
+    
+    Arguments: mpc_file (str) -- a path to the data file to read from.
+    Returns: (dict) -- the keys correspond to the utc date for each observation,
+    a list is returned for each key where [0] corresponds to the observation code
+    and [1] corresponds to the julian date.
+    """
+
     read_file = pd.read_csv(mpc_file)
     read_file.to_csv ('mpc_file.csv', index=None)
     csv_url = 'mpc_file.csv'
     dates = []
     ids = []
+    obs_ids = []
+
     with open(csv_url) as csvfile:
         spamreader = csv.reader(csvfile)
         for row in spamreader:
@@ -53,8 +64,15 @@ def MPC_parser(mpc_file):
             day = day[:2]
             date = year+'-'+month+'-'+day+time_string
             dates.append(date[:23])
+            observation_id = row_string[47:]
+            obs_ids.append(observation_id)
     utc_dates = np.array(dates)
-    return dates
+    time_object = Time(utc_dates, format='isot')
+    julian_dates = time_object.jd
+    observations = {}
+    for idx, date in enumerate(utc_dates):
+        observations[date] = [obs_ids[idx], julian_dates[idx]]
+    return observations
 
 
 def WISE_parser(wise_file):
