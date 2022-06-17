@@ -6,12 +6,34 @@ import pandas as pd
 import datetime
 
 
+def month_plot(dates, title):
+    trimmed_dates = []
+    for date in dates:
+        year = date[:4]
+        month = date[5:7]
+        day = date[8:10]
+        date_string = year + month + day
+        trimmed_dates.append(date_string)
+
+    dtm = lambda x: int(x[4:6])
+    months = list(map(dtm, trimmed_dates))
+
+    fig, ax = plt.subplots()
+    bins = np.arange(1,14)
+    ax.hist(months, bins = bins, edgecolor="k", align='left')
+    ax.set_xticks(bins[:-1])
+    ax.set_title(title)
+    ax.set_xticklabels([datetime.date(1900,i,1).strftime('%b') for i in bins[:-1]] )
+    plt.savefig(title + '.png')
+
+
 mpc_data = '161989.txt'
 wise_data = 'table_irsa_catalog_search_results.tbl'
 unique_epochs = data_comparer(mpc_data, wise_data)
 
 wise_data = list(WISE_parser(wise_data).keys())
 mpc_data = list(MPC_parser(mpc_data).keys())
+unique_data = list(unique_epochs.values())
 
 #Trimmed month list for MPC Data
 trimmed_month_mpc = []
@@ -50,6 +72,10 @@ print(mpc_count)
 tot_count = []
 #months = list(map(months, dates))
 
+month_plot(mpc_data, "mpc")
+month_plot(wise_data, "wise")
+month_plot(unique_data, "unique")
+
 
 #Counting observations in each month for WISE
 wise_count = pd.Series(trimmed_month_wise).value_counts()
@@ -69,24 +95,7 @@ y = month_obs_wise
 #plt.bar(month_obs_mpc)
 #plt.xticks(month_obs_mpc, labels)
 
-mpc_utc_trimmed = []
-for date in mpc_data:
-    year = date[:4]
-    month = date[5:7]
-    day = date[8:10]
-    date_string = year + month + day
-    mpc_utc_trimmed.append(date_string)
 
-dtm = lambda x: int(x[4:6])
-months = list(map(dtm, mpc_utc_trimmed))
-
-fig, ax = plt.subplots()
-bins = np.arange(1,14)
-ax.hist(months, bins = bins, edgecolor="k", align='left')
-ax.set_xticks(bins[:-1])
-ax.set_xticklabels([datetime.date(1900,i,1).strftime('%b') for i in bins[:-1]] )
-
-plt.show()
 
 """
 plt.hist(mpc_count, alpha=0.5, label= 'MPC Data')
