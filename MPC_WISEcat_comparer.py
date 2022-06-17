@@ -1,19 +1,13 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[3]:
-
 
 import csv 
 import math
 from astropy.time import Time
+from astropy.table import Table
 import pandas as pd
 import numpy as np
-
-
-# Utility functions
-
-# In[4]:
 
 
 def decimal_day_converter(dec_day):
@@ -48,11 +42,6 @@ def n_round(x, n):
     return base * round(x/base)
 
 
-# MPC data reading
-
-# In[5]:
-
-
 def MPC_parser(mpc_file):
     read_file = pd.read_csv(mpc_file)
     read_file.to_csv ('mpc_file.csv', index=None)
@@ -80,11 +69,6 @@ def MPC_parser(mpc_file):
     return dates
 
 
-# WISE data reading
-
-# In[6]:
-
-
 from pandas import *
 def WISE_parser(wise_file):
     
@@ -110,18 +94,8 @@ def WISE_parser(wise_file):
     return modified_time
 
 
-# Rounding utility function
-
-# In[7]:
-
-
 def base_round(x, base=5):
     return base * round(x/base)
-
-
-# Comparison function between MPC and WISE catalog
-
-# In[10]:
 
 
 def comparison(mpc_file, wise_file):
@@ -179,12 +153,8 @@ def comparison(mpc_file, wise_file):
     return rounded_mpc_data, rounded_wise_data, new_epochs
 
 
-# In[11]:
-
-
 mpc_data = '161989.txt'
 wise_data = 'table_irsa_catalog_search_results-2.csv'
 mpc_data, wise_data, new_epochs = comparison(mpc_data, wise_data)
-#print(mpc_data)
-#print(wise_data)
+print(new_epochs)
 
