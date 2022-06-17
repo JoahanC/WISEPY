@@ -1,7 +1,3 @@
-#!/usr/bin/env python
-# coding: utf-8
-
-
 import csv 
 import math
 from astropy.time import Time
@@ -153,8 +149,5 @@ def comparison(mpc_file, wise_file):
     return rounded_mpc_data, rounded_wise_data, new_epochs
 
 
-mpc_data = '161989.txt'
-wise_data = 'table_irsa_catalog_search_results-2.csv'
-mpc_data, wise_data, new_epochs = comparison(mpc_data, wise_data)
-print(new_epochs)
+
 
