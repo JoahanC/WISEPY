@@ -3,37 +3,40 @@ import matplotlib.pyplot as plt
 import numpy as np
 import math
 import pandas as pd
+import datetime
+
 
 mpc_data = '161989.txt'
-wise_data = 'table_irsa_catalog_search_results-2.csv'
-mpc_data, wise_data, new_epochs = comparison(mpc_data, wise_data)
-print(new_epochs)
+wise_data = 'table_irsa_catalog_search_results.tbl'
+unique_epochs = data_comparer(mpc_data, wise_data)
 
-
-print(mpc_data)
-print(wise_data)
+wise_data = list(WISE_parser(wise_data).keys())
+mpc_data = list(MPC_parser(mpc_data).keys())
 
 #Trimmed month list for MPC Data
 trimmed_month_mpc = []
+trimmed_year_mpc = []
 
 for i in mpc_data:
     trimmed_month_mpc.append(i[5:7])
-
-print(trimmed_month_mpc)
+for i in mpc_data:
+    trimmed_year_mpc.append(i[:4])
 
 #Trimmed month list for WISE Data
 trimmed_month_wise = []
+trimmed_year_wise = []
 
 for i in wise_data:
     trimmed_month_wise.append(i[5:7])
-
-print(trimmed_month_wise)
+for i in wise_data:
+    trimmed_year_wise.append(i[:4])
 
 #Counting observations in each month for MPC
-mpc_count = pd.Series(trimmed_month_mpc).value_counts()
-print("MPC Jan:" ,mpc_count["01"])
-print("MPC Feb:" ,mpc_count["02"])
-print("MPC March:" ,mpc_count["03"])
+mpc_count = dict(pd.Series(trimmed_month_mpc).value_counts())
+months = ["01","02","03","04","05","06","07","08","09","10","11","12"]
+print("MPC Jan:", mpc_count["01"])
+print("MPC Feb:", mpc_count["02"])
+print("MPC March:", mpc_count["03"])
 print("MPC April:" ,mpc_count["04"])
 print("MPC May:" ,mpc_count["05"])
 print("MPC June:" ,mpc_count["06"])
@@ -43,6 +46,10 @@ print("MPC Sept:" ,mpc_count["09"])
 print("MPC Oct:" ,mpc_count["10"])
 print("MPC Nov:" ,mpc_count["11"])
 print("MPC Dec:" ,mpc_count["12"])
+print(mpc_count)
+tot_count = []
+#months = list(map(months, dates))
+
 
 #Counting observations in each month for WISE
 wise_count = pd.Series(trimmed_month_wise).value_counts()
@@ -62,9 +69,27 @@ y = month_obs_wise
 #plt.bar(month_obs_mpc)
 #plt.xticks(month_obs_mpc, labels)
 
+mpc_utc_trimmed = []
+for date in mpc_data:
+    year = date[:4]
+    month = date[5:7]
+    day = date[8:10]
+    date_string = year + month + day
+    mpc_utc_trimmed.append(date_string)
 
+dtm = lambda x: int(x[4:6])
+months = list(map(dtm, mpc_utc_trimmed))
 
-plt.hist(month_obs_mpc, alpha=0.5, label= 'MPC Data')
+fig, ax = plt.subplots()
+bins = np.arange(1,14)
+ax.hist(months, bins = bins, edgecolor="k", align='left')
+ax.set_xticks(bins[:-1])
+ax.set_xticklabels([datetime.date(1900,i,1).strftime('%b') for i in bins[:-1]] )
+
+plt.show()
+
+"""
+plt.hist(mpc_count, alpha=0.5, label= 'MPC Data')
 #plt.hist(y, alpha =0.5, label = 'WISE Data')
 plt.xticks(np.arange(12), months)
 plt.legend(loc='upper right')
@@ -74,4 +99,4 @@ plt.show()
 
 #for i in trimmed_month_mpc:
 #     list = trimmed_month_mpc.count(i)
-#  print(list)
+#  print(list)"""
