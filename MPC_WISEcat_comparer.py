@@ -10,9 +10,11 @@ from numpy import source
 def decimal_day_converter(dec_day):
     """
     Turns a decimal day interpretation into a UTC format.
-    Parameters: day
-    Returns: String in the format: 'HH:MM:SS'
+    Parameters: dec_day (str) -- a representation of a fractional day; ie. 0.5,
+    0.90, 0.03, 0.11214, etc. 
+    Returns: (str) a day interpretation in the format: 'HH:MM:SS'
     """
+
     hour_remainder = float(dec_day) * 24
     hours = math.floor(hour_remainder)
     hours_str = str(hours).zfill(2)
@@ -24,7 +26,6 @@ def decimal_day_converter(dec_day):
     sec_remainder = (min_remainder - mins) * 60
     secs = sec_remainder
     secs_str = str(secs).zfill(2)
-    
     
     return 'T' + hours_str + ':' + mins_str + ':' + secs_str
 
@@ -66,6 +67,7 @@ def WISE_parser(wise_file):
     a list is returned for each key where [0] corresponds to jd and [1]
     corresponds to utc.
     """
+
     data_object = Table.read(wise_file, format='ipac')
     dates = list(data_object['mjd'])
     source_ids = list(data_object['source_id'])
