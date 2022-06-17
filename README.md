@@ -1,2 +1,3 @@
 # mpc_wisecat_comparer 
-Code compares data from MPC and the WISE catalog for a given object.
+
+Code base for extracting MPC and WISE data for a given object to search for additional useful epochs in WISE data.
