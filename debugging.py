@@ -1,4 +1,4 @@
-from MPC_WISEcat_comparer import *
+from mpc_wise_functions import *
 
 
 mpc_file = '161989.txt'

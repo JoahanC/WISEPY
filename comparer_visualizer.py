@@ -1,4 +1,4 @@
-from MPC_WISEcat_comparer import *
+from mpc_wise_functions import *
 import matplotlib.pyplot as plt
 import numpy as np
 import math
@@ -24,12 +24,13 @@ def month_plot(dates, title):
     ax.set_xticks(bins[:-1])
     ax.set_title(title)
     ax.set_xticklabels([datetime.date(1900,i,1).strftime('%b') for i in bins[:-1]] )
-    plt.savefig(title + '.png')
+    plt.savefig(f"outputs/{title}")
 
 
 mpc_data = '161989.txt'
 wise_data = 'table_irsa_catalog_search_results.tbl'
 unique_epochs = data_comparer(mpc_data, wise_data)
+print(unique_epochs)
 
 wise_data = list(WISE_parser(wise_data).keys())
 mpc_data = list(MPC_parser(mpc_data).keys())
