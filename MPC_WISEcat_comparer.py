@@ -1,6 +1,6 @@
 import csv 
 import math
-from astropy.time import Time
+from astropy.time import Time, TimeDelta
 from astropy.table import Table
 import pandas as pd
 import numpy as np
@@ -148,28 +148,27 @@ def data_comparer(mpc_file, wise_file):
     wise_utc = list(wise_image_data.keys())
     mpc_utc = list(mpc_observation_data.keys())
 
-    # Comparison sort
-    rounded_mpc_data = []
-    rounded_wise_data = {}
+    mpc_intervals = {}
+    utc_delta = TimeDelta("11.0", format='sec')
     for datum in mpc_utc:
-        pre_seconds = datum[:17]
-        seconds = str(n_round(float(datum[17:]))).zfill(2)
-        rounded_mpc_data.append(pre_seconds + seconds)
-        
+        base_time = Time(datum, format='isot')
+        lower_bound = base_time - utc_delta
+        upper_bound = base_time + utc_delta
+        mpc_intervals[datum] = [lower_bound.jd, upper_bound.jd]
+
+    wise_intervals = {}
     for datum in wise_utc:
-        pre_seconds = datum[:17]
-        seconds = str(n_round(float(datum[17:]))).zfill(2)
-        rounded = pre_seconds + seconds
-        rounded_wise_data[rounded] = datum
+        base_time = Time(datum, format='isot')
+        wise_intervals[datum] = [base_time.jd]
 
-    new_epochs = np.array([epoch for epoch in rounded_wise_data.keys() if epoch not in rounded_mpc_data])
-    new_epoch_ids = []
-    for epoch in new_epochs:
-        new_epoch_ids.append(wise_image_data[rounded_wise_data[epoch]][0])
-    
-    print("New epochs observed in WISE catalog:", len(new_epochs))
-    unique_epochs = {}
-    for idx, id in enumerate(new_epoch_ids):
-        unique_epochs[id] = new_epochs[idx]
+    new_epochs = {}
+    for epoch in wise_intervals:
+        recorded = False
+        for observation in mpc_intervals:
+            if wise_intervals[epoch] >= mpc_intervals[observation][0] and wise_intervals[epoch] <= mpc_intervals[observation][1]:
+                recorded = True
+        if not recorded:
+            new_epochs[epoch] = wise_intervals[epoch]
 
-    return unique_epochs
+    print(f"New epochs detected in WISE catalog: {len(new_epochs)}")
+    return new_epochs
