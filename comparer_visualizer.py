@@ -1,15 +1,11 @@
 from mpc_wise_functions import *
 import matplotlib.pyplot as plt
 import numpy as np
-import math
 import pandas as pd
 import datetime
 
 
-def month_plot(dates, title, year):
-
-    if year == "Cumulative":
-        year = "all years"
+def month_plot(dates, title, title_year):
 
     trimmed_dates = []
     for date in dates:
@@ -26,8 +22,10 @@ def month_plot(dates, title, year):
     ax.set_xticks(bins[:-1])
     ax.set_title(title)
     ax.set_xticklabels([datetime.date(1900,i,1).strftime('%b') for i in bins[:-1]])
-    plt.title(f"Epochs in {title} dataset during {year}")
-    plt.savefig(f"output/{title}_{year}")
+    plt.title(f"Epochs in {title} dataset during {title_year}")
+    if title_year == "all years":
+        title_year = "Cumulative"
+    plt.savefig(f"output/{title}_{title_year}")
     plt.close()
 
 
@@ -111,11 +109,11 @@ for datum in unique_data:
     else:
         unique_year_data[year].append(datum)
 
-#for year in unique_year_data:
-#    month_plot(unique_year_data[year], "Unique", year)
+for year in unique_year_data:
+    month_plot(unique_year_data[year], "Unique", year)
 
-month_plot(mpc_data, "MPC", "Cumulative")
-month_plot(wise_data, "WISE", "Cumulative")
-month_plot(unique_data, "Unique", "Cumulative")
+month_plot(mpc_data, "MPC", "all years")
+month_plot(wise_data, "WISE", "all years")
+month_plot(unique_data, "Unique", "all years")
 
 
