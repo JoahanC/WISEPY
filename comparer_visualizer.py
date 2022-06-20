@@ -6,12 +6,14 @@ import pandas as pd
 import datetime
 
 
-def month_plot(dates, title):
+def month_plot(dates, title, year):
+
+    if year == "Cumulative":
+        year = "all years"
+
     trimmed_dates = []
     for date in dates:
-        year = date[:4]
-        month = date[5:7]
-        day = date[8:10]
+        year, month, day = date[:4], date[5:7], date[8:10]
         date_string = year + month + day
         trimmed_dates.append(date_string)
 
@@ -20,21 +22,22 @@ def month_plot(dates, title):
 
     fig, ax = plt.subplots()
     bins = np.arange(1,14)
-    ax.hist(months, bins = bins, edgecolor="k", align='left')
+    ax.hist(months, bins = bins, edgecolor="k", align='left', color='black')
     ax.set_xticks(bins[:-1])
     ax.set_title(title)
-    ax.set_xticklabels([datetime.date(1900,i,1).strftime('%b') for i in bins[:-1]] )
-    plt.savefig(f"outputs/{title}")
+    ax.set_xticklabels([datetime.date(1900,i,1).strftime('%b') for i in bins[:-1]])
+    plt.title(f"Epochs in {title} dataset during {year}")
+    plt.savefig(f"output/{title}_{year}")
+    plt.close()
 
 
 mpc_data = '161989.txt'
 wise_data = 'table_irsa_catalog_search_results.tbl'
 unique_epochs = data_comparer(mpc_data, wise_data)
-print(unique_epochs)
 
 wise_data = list(WISE_parser(wise_data).keys())
 mpc_data = list(MPC_parser(mpc_data).keys())
-unique_data = list(unique_epochs.values())
+unique_data = list(unique_epochs.keys())
 
 #Trimmed month list for MPC Data
 trimmed_month_mpc = []
@@ -56,57 +59,63 @@ for i in wise_data:
 
 #Counting observations in each month for MPC
 mpc_count = dict(pd.Series(trimmed_month_mpc).value_counts())
-months = ["01","02","03","04","05","06","07","08","09","10","11","12"]
-print("MPC Jan:", mpc_count["01"])
-print("MPC Feb:", mpc_count["02"])
-print("MPC March:", mpc_count["03"])
-print("MPC April:" ,mpc_count["04"])
-print("MPC May:" ,mpc_count["05"])
-print("MPC June:" ,mpc_count["06"])
-print("MPC July:" ,mpc_count["07"])
-print("MPC Aug:" ,mpc_count["08"])
-print("MPC Sept:" ,mpc_count["09"])
-print("MPC Oct:" ,mpc_count["10"])
-print("MPC Nov:" ,mpc_count["11"])
-print("MPC Dec:" ,mpc_count["12"])
-print(mpc_count)
-tot_count = []
-#months = list(map(months, dates))
-
-month_plot(mpc_data, "mpc")
-month_plot(wise_data, "wise")
-month_plot(unique_data, "unique")
-
+months = {"01": "Jan", "02": "Feb", "03": "Mar", "04": "Apr", "05": "May", 
+          "06": "Jun", "07": "Jul", "08": "Aug", "09": "Sep", "10": "Oct", 
+          "11": "Nov", "12": "Dec"}
+print("MPC epoch counts by month:")
+for month in months:
+    if month not in mpc_count.keys():
+        mpc_count[month] = 0
+    print(months[month] + ":", mpc_count[month])
+print("Total MPC epochs:", sum(mpc_count.values()))
 
 #Counting observations in each month for WISE
-wise_count = pd.Series(trimmed_month_wise).value_counts()
-print("WISE Jan:" ,wise_count["01"])
-print("WISE Feb:" ,wise_count["02"])
+wise_count = dict(pd.Series(trimmed_month_wise).value_counts())
+print("WISE epoch counts by month:")
+for month in months:
+    if month not in wise_count.keys():
+        wise_count[month] = 0
+    print(months[month] + ":", wise_count[month])
+print("Total WISE epochs:", sum(wise_count.values()))
 
-#number of observations per month into list for mpc
-month_obs_mpc = [96, 481, 588, 146, 40, 26, 9, 37, 30, 15, 13, 25]
-month_obs_wise = [10, 124, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-months = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12']
+# MPC month plots by year per month
+mpc_year_data = {}
+for datum in mpc_data:
+    year, month, day = datum[:4], datum[5:7], datum[8:10]
+    if year not in mpc_year_data.keys():
+        mpc_year_data[year] = [datum]
+    else:
+        mpc_year_data[year].append(datum)
 
-x = month_obs_mpc
-y = month_obs_wise
+for year in mpc_year_data:
+    month_plot(mpc_year_data[year], "MPC", year)
+
+# WISE month plots by year per month
+wise_year_data = {}
+for datum in wise_data:
+    year, month, day = datum[:4], datum[5:7], datum[8:10]
+    if year not in wise_year_data.keys():
+        wise_year_data[year] = [datum]
+    else:
+        wise_year_data[year].append(datum)
+
+for year in wise_year_data:
+    month_plot(wise_year_data[year], "WISE", year)
+
+# New epoch month plots by year per month
+unique_year_data = {}
+for datum in unique_data:
+    year, month, day = datum[:4], datum[5:7], datum[8:10]
+    if year not in unique_year_data.keys():
+        unique_year_data[year] = [datum]
+    else:
+        unique_year_data[year].append(datum)
+
+#for year in unique_year_data:
+#    month_plot(unique_year_data[year], "Unique", year)
+
+month_plot(mpc_data, "MPC", "Cumulative")
+month_plot(wise_data, "WISE", "Cumulative")
+month_plot(unique_data, "Unique", "Cumulative")
 
 
-#labels = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12']
-#plt.bar(month_obs_mpc)
-#plt.xticks(month_obs_mpc, labels)
-
-
-
-"""
-plt.hist(mpc_count, alpha=0.5, label= 'MPC Data')
-#plt.hist(y, alpha =0.5, label = 'WISE Data')
-plt.xticks(np.arange(12), months)
-plt.legend(loc='upper right')
-plt.show()
-
-#Count observations in each month
-
-#for i in trimmed_month_mpc:
-#     list = trimmed_month_mpc.count(i)
-#  print(list)"""
