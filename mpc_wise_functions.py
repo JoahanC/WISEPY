@@ -109,24 +109,20 @@ def n_round(x, n=5):
     return n * round(x/n)
 
 
-def data_comparer(mpc_file, wise_file):
+def data_comparer(mpc_file, wise_file, stats):
     """
-    Compares the observational instances between the MPC and WISE dataset files for a given object. ds
+    Compares the observational instances between the MPC and WISE dataset files for a given object. 
     Arguments: mpc_file (str) -- txt file which contains MPC data
                wise_file (str) -- file which contains WISE
     """
     
     mpc_observation_data = MPC_parser(mpc_file)
     wise_image_data = WISE_parser(wise_file)
-    print("-------------Database Statistics---------------- \n")
-    print("Epochs observed in the MPC database:", len(mpc_observation_data))
-    print("Epochs observed in the WISE database:", len(wise_image_data))
     
     # Year Counting
     wise_years = []
     mpc_years = []
     for datum in wise_image_data:
-        print(datum)
         year = int(datum[:4])
         if year not in wise_years:
             wise_years.append(year)
@@ -138,11 +134,10 @@ def data_comparer(mpc_file, wise_file):
     wise_years_str = ""
     for year in wise_years:
         wise_years_str += str(year) + ", "
-    print("Years in which WISE data was collected: " + wise_years_str[:-2])
+    
     mpc_years_str = ""
     for year in mpc_years:
         mpc_years_str += str(year) + ", "
-    print("Years in which MPC data was collected: " + mpc_years_str[:-2])
     
     # Acquire utc dates
     wise_utc = list(wise_image_data.keys())
@@ -170,5 +165,16 @@ def data_comparer(mpc_file, wise_file):
         if not recorded:
             new_epochs[epoch] = wise_image_data[epoch]
 
-    print(f"New epochs detected in WISE catalog: {len(new_epochs)}")
+    if stats:
+        print("Epochs observed in the MPC database:", len(mpc_observation_data))
+        print("Epochs observed in the WISE database:", len(wise_image_data))
+        print("Years in which MPC data was collected: " + mpc_years_str[:-2])
+        print("Years in which WISE data was collected: " + wise_years_str[:-2])
+        print(f"New epochs detected in WISE catalog: {len(new_epochs)}")
+        print('-' * 42)
+        print(' ' * 7 + 'Time (utc)' + ' ' * 7 + '|' + ' ' * 4 + 'Source ID' + ' ' * 3)
+        print('-' * 42)
+        for epoch in new_epochs:
+            print(f"{epoch}", '|', f"{new_epochs[epoch][0]}" )
+
     return new_epochs
