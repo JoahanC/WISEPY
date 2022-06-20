@@ -109,7 +109,7 @@ def n_round(x, n=5):
     return n * round(x/n)
 
 
-def data_comparer(mpc_file, wise_file, stats):
+def comparer(mpc_file, wise_file, stats):
     """
     Compares the observational instances between the MPC and WISE dataset files for a given object. 
     Arguments: mpc_file (str) -- txt file which contains MPC data

@@ -1,5 +1,6 @@
 from mpc_wise_functions import *
 import matplotlib.pyplot as plt
+from matplotlib.ticker import MaxNLocator
 import numpy as np
 import pandas as pd
 import datetime
@@ -33,13 +34,23 @@ def month_plot(dates, title, title_year):
     ax.set_xticks(bins[:-1])
     ax.set_title(title)
     ax.set_xticklabels([datetime.date(1900,i,1).strftime('%b') for i in bins[:-1]])
+    ax.yaxis.set_major_locator(MaxNLocator(integer=True))
     if title == "Unique":
         plt.title(f"New epochs found during {title_year}")
-    plt.title(f"Epochs in the {title} dataset during {title_year}")
-    if title_year == "all years":
-        title_year = "Cumulative"
-    plt.savefig(f"output/{title}_{title_year}")
-    plt.close()
+        if title_year == "all years":
+            title_year = "Cumulative"
+        plt.xlabel("Month")
+        plt.ylabel("Count")
+        plt.savefig(f"output/new_epochs_{title_year}")
+        plt.close()
+    else:
+        plt.title(f"Epochs in the {title} dataset during {title_year}")
+        if title_year == "all years":
+            title_year = "Cumulative"
+        plt.xlabel("Month")
+        plt.ylabel("Count")
+        plt.savefig(f"output/{title}_{title_year}")
+        plt.close()
 
 
 def visualizer(mpc_file, wise_file, clear_dir):
