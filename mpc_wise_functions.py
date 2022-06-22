@@ -82,13 +82,16 @@ def WISE_parser(wise_file):
     
     Arguments: wise_file (str) -- a path to the data file to read from.
     Returns: (dict) -- the keys correspond to the utc dates for each image,
-    a list is returned for each key where [0] corresponds to source_id and [1]
-    corresponds to julian dates.
+    a list is returned for each key where [0] corresponds to source_id, [1]
+    corresponds to julian dates, [2] corresponds to the ra, and [3] corresponds
+    to nthe dec
     """
 
     data_object = Table.read(wise_file, format='ipac')
     dates = list(data_object['mjd'])
     source_ids = list(data_object['source_id'])
+    ra = list(data_object['ra'])
+    dec = list(data_object['dec'])
 
     time_object = Time(dates, format='mjd', scale='utc')
     julian_dates = time_object.jd
@@ -96,7 +99,7 @@ def WISE_parser(wise_file):
 
     images = {}
     for idx, date in enumerate(utc_dates):
-        images[str(date)] = [source_ids[idx], julian_dates[idx]]
+        images[str(date)] = [source_ids[idx], julian_dates[idx], ra[idx], dec[idx]]
     return images
 
 def n_round(x, n=5):
