@@ -11,4 +11,4 @@ for epoch in new_epochs:
     source_id_list.append(new_epochs[epoch][0])
 name_list = ["cacus"] * len(source_id_list)
 dat = Table([name_list, source_id_list], names=["name", "source_id"])
-dat.write("table.tbl", format="ipac")
+dat.write("table.tbl", format="ipac", overwrite=True)
