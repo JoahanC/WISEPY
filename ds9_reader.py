@@ -40,7 +40,7 @@ for file in files:
 """
 os.popen("ds9")
 run_string = "open "
-for file in to_run:
+for file in renamed_sorted_run:
     run_string += file + ' '
 os.popen(run_string)
 os.popen("-single")"""

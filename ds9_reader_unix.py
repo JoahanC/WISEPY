@@ -90,7 +90,7 @@ for file in w_sorted:
     renamed_sorted_run.append("WISE_Files/" + file)
 
 run_string = "ds9 -tile "
-for file in to_run:
+for file in renamed_sorted_run:
     run_string += file + ' '
 
 os.popen(run_string)
