@@ -80,10 +80,11 @@ for i in idx:
         w_sorted.extend([pair[0], pair[1]])
     else:
         w_sorted.extend([pair[1], pair[0]])
-
+counter = 0
 for file in w_sorted:
+    counter += 1
     print(file)
-
+print(counter)
 # Renaming files to correct directory
 renamed_sorted_run = []
 for file in w_sorted:

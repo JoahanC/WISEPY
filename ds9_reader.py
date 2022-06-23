@@ -31,11 +31,12 @@ def make_region(file, w_band, source_ids):
 files2 = os.listdir("regions")
 for f in files2:
     os.remove("regions/" + f)
-
+counter = 0
 for file in files:
     if file[:9] in source_ids:
+        counter += 1
         make_region(file, file[10:12], source_ids)
-
+print(counter)
 
 """
 os.popen("ds9")
