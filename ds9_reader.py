@@ -21,12 +21,12 @@ def make_region(file, w_band, source_ids):
     sid = file[:9:]
     with open(f"regions/{sid}_{w_band}.reg", 'w') as file:
         file.write("# Region file format: DS9 version 4.1\n")
-        file.write('global color=green dashlist=8 3 width=1' 
-                + 'font="helvetica 10 normal roman" select=1' 
-                + 'highlite=1 dash=0 fixed=0 edit=1 move=1 delete=1' 
+        file.write('global color=green dashlist=8 3 width=1 ' 
+                + 'font="helvetica 10 normal roman" select=1 ' 
+                + 'highlite=1 dash=0 fixed=0 edit=1 move=1 delete=1 ' 
                 + 'include=1 source=1\n')
         file.write("fk5\n")
-        file.write(f'circle({source_ids[sid][0]},{source_ids[sid][1]},30.000")')
+        file.write(f'circle({source_ids[sid][0]},{source_ids[sid][1]},15.000")')
 
 files2 = os.listdir("regions")
 for f in files2:

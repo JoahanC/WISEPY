@@ -1,13 +1,13 @@
 #reference code from ds9_reader
-from unittest import skip
 from mpc_wise_functions import *
+from ds9_reader import make_region
 import os
 import re
 
 
 mpc_file = "161989.txt"
 wise_file = "table_irsa_catalog_search_results.tbl"
-new_epochs = comparer(mpc_file, wise_file, False)
+new_epochs = comparer(mpc_file, wise_file, True)
 
 source_ids = []
 for epoch in new_epochs:
@@ -31,7 +31,7 @@ for file in to_run:
 
 key_sort = list(file_id.keys())
 key_sort.sort()
-print(key_sort)
+#print(key_sort)
 
 # Sorting all files by first five numebers
 number_sorted = {}
@@ -81,16 +81,17 @@ for i in idx:
     else:
         w_sorted.extend([pair[1], pair[0]])
 
-for file in w_sorted:
-    print(file)
+#for file in w_sorted:
+#    print(file)
 
 # Renaming files to correct directory
 renamed_sorted_run = []
 for file in w_sorted:
     renamed_sorted_run.append("WISE_Files/" + file)
 
-run_string = "ds9 -tile "
-for file in renamed_sorted_run:
-    run_string += file + ' '
-
+run_string = "ds9 -scale log -tile "
+for file in renamed_sorted_run[:50]:
+    run_string += file + ' -regions '
+    reg_string = "regions/" + file[11:20] + '_' + file[21:23] + ".reg"
+    run_string += reg_string + ' '
 os.popen(run_string)
