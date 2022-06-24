@@ -100,7 +100,11 @@ def data_sort(source_ids):
 
     return renamed_sorted_run
 
-new_epochs = comparer(sys.argv[1], sys.argv[2], False)
+mpc_file = "input_data/" + sys.argv[1] + ".txt"
+wise_file = "input_data/" + sys.argv[1] + ".tbl"
+
+new_epochs = comparer(mpc_file, wise_file, False)
+
 source_ids = []
 for epoch in new_epochs:
     source_ids.append(new_epochs[epoch][0][:9])
@@ -108,8 +112,8 @@ for epoch in new_epochs:
 renamed_sorted_run = data_sort(source_ids)
 file_region = {}
 for file in renamed_sorted_run:
-    sid = file[13 + len(sys.argv[3]):22 + len(sys.argv[3])]
-    band = file[23 + len(sys.argv[3]):25 + len(sys.argv[3])]
+    sid = file[13 + len(sys.argv[1]):22 + len(sys.argv[1])]
+    band = file[23 + len(sys.argv[1]):25 + len(sys.argv[1])]
     file_region[file] = f"regions/{sid}_{band}.reg"
 
 run_string = "ds9 -scale log -tile "
