@@ -183,7 +183,7 @@ def comparer(mpc_file, wise_file, stats):
     return new_epochs
 
 
-def generate_source_ids(mpc_file, wise_file):
+def generate_source_ids_list(mpc_file, wise_file):
     """
     Generates a list of unique source_ids
     """
@@ -192,3 +192,17 @@ def generate_source_ids(mpc_file, wise_file):
     for epoch in new_epochs:
         source_ids.append(new_epochs[epoch][0][:9])
     return source_ids
+
+def generate_source_ids_dict(mpc_file, wise_file):
+    new_epochs = comparer(mpc_file, wise_file, False)
+    wise_data = WISE_parser(wise_file)
+
+    data_object = Table.read(wise_file, format='ipac')
+    source_ids_2 = list(data_object['source_id'])
+    ra = list(data_object['ra'])
+    dec = list(data_object['dec'])
+    info = {}
+    for index, source_id in enumerate(source_ids_2):
+        info[source_id[:9]] = [ra[index], dec[index]]
+
+    return info

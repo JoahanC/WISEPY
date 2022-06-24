@@ -5,7 +5,7 @@ import re
 import sys
 
 
-def make_region(file, w_band, source_ids):
+def make_region(file, source_ids, mpc_code):
     """
     Makes a region file for a given .fits file in the regions folder.
     Arguments: file (str) -- the .fits file
@@ -13,8 +13,9 @@ def make_region(file, w_band, source_ids):
                source_ids (dict) -- the source_id lookup table
     Returns: None (file in regions folder)
     """
-    sid = file[:9:]
-    with open(f"regions/{sid}_{w_band}.reg", 'w') as file:
+    sid = file[13 + len(mpc_code):22 + len(mpc_code)]
+    band = file[23 + len(mpc_code):25 + len(mpc_code)]
+    with open(f"regions/{sid}_{band}.reg", 'w') as file:
         file.write("# Region file format: DS9 version 4.1\n")
         file.write('global color=green dashlist=8 3 width=1 ' 
                 + 'font="helvetica 10 normal roman" select=1 ' 
@@ -24,7 +25,7 @@ def make_region(file, w_band, source_ids):
         file.write(f'circle({source_ids[sid][0]},{source_ids[sid][1]},15.000")')
 
 
-def data_sort(source_ids):
+def data_sort(source_ids, mpc_code):
     """
     The sorting algorithm for a given object's dataset.
     Arguments: source_ids (list) - a list of all unique epoch source ids.
@@ -32,7 +33,7 @@ def data_sort(source_ids):
              provided.
     """
     
-    files = os.listdir("wise_images/161989/")
+    files = os.listdir("wise_images/" + mpc_code + '/')
     to_run = []
     for file in files:
         if file[:9] in source_ids:
@@ -99,12 +100,12 @@ def data_sort(source_ids):
     # Renaming files to correct directory
     renamed_sorted_run = []
     for file in w_sorted:
-        renamed_sorted_run.append("wise_images/161989/" + file)
+        renamed_sorted_run.append("wise_images/" + mpc_code + '/' + file)
 
     return renamed_sorted_run
 
 
-def generate_script(source_ids, lower_bound, upper_bound):
+def generate_script(source_ids, lower_bound, upper_bound, mpc_code):
     """
     Generates the ds9 script for running ds9_viewer.py.
     Arguments: source_ids (list) - A list of all relevant source ids to run
@@ -112,12 +113,25 @@ def generate_script(source_ids, lower_bound, upper_bound):
                upperbound (int) - the ending index to load from the ids
     Returns: (str) - a set of ds9 commands to run in the terminal
     """
-    sorted_files = data_sort(source_ids)
+    sorted_files = data_sort(source_ids, mpc_code)
+
+    region_files = os.listdir("regions")
+    for file in region_files:
+        os.remove("regions/" + file)
+
+    mpc_file = "input_data/" + sys.argv[1] + ".txt"
+    wise_file = "input_data/" + sys.argv[1] + ".tbl"
+
+    lookup_table = generate_source_ids_dict(mpc_file, wise_file)
+
+    for file in sorted_files:
+        sid = file[13 + len(mpc_code):22 + len(mpc_code)]
+        make_region(file, lookup_table, mpc_code)
 
     file_region = {}
     for file in sorted_files:
-        sid = file[13 + len(sys.argv[1]):22 + len(sys.argv[1])]
-        band = file[23 + len(sys.argv[1]):25 + len(sys.argv[1])]
+        sid = file[13 + len(mpc_code):22 + len(mpc_code)]
+        band = file[23 + len(mpc_code):25 + len(mpc_code)]
         file_region[file] = f"regions/{sid}_{band}.reg"
 
     run_string = "ds9 -scale log -tile "
