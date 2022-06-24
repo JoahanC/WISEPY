@@ -100,8 +100,8 @@ def data_sort(source_ids, new_epochs):
     return renamed_sorted_run
 
 
-mpc_file = "161989.txt"
-wise_file = "table_irsa_catalog_search_results.tbl"
+mpc_file = "input_data/161989.txt"
+wise_file = "input_data/161989.tbl"
 new_epochs = comparer(mpc_file, wise_file, True)
 source_ids = []
 for epoch in new_epochs:
@@ -110,7 +110,7 @@ for epoch in new_epochs:
 renamed_sorted_run = data_sort(source_ids, new_epochs)
 
 run_string = "ds9 -scale log -tile "
-for file in renamed_sorted_run[:50]:
+for file in renamed_sorted_run[:10]:
     run_string += file + ' -regions '
     reg_string = "regions/" + file[11:20] + '_' + file[21:23] + ".reg"
     run_string += reg_string + ' '

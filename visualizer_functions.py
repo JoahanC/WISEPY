@@ -41,7 +41,7 @@ def month_plot(dates, title, title_year):
             title_year = "Cumulative"
         plt.xlabel("Month")
         plt.ylabel("Count")
-        plt.savefig(f"output/new_epochs_{title_year}")
+        plt.savefig(f"output_plots/new_epochs_{title_year}")
         plt.close()
     else:
         plt.title(f"Epochs in the {title} dataset during {title_year}")
@@ -49,7 +49,7 @@ def month_plot(dates, title, title_year):
             title_year = "Cumulative"
         plt.xlabel("Month")
         plt.ylabel("Count")
-        plt.savefig(f"output/{title}_{title_year}")
+        plt.savefig(f"output_plots/{title}_{title_year}")
         plt.close()
 
 
@@ -72,9 +72,9 @@ def visualizer(mpc_file, wise_file, clear_dir):
     unique_data = list(unique_epochs.keys())
 
     if clear_dir:
-        files = os.listdir("output")
+        files = os.listdir("output_plots")
         for f in files:
-            os.remove("output/" + f)
+            os.remove("output_plots/" + f)
 
     #Trimmed month list for MPC Data
     trimmed_month_mpc = []

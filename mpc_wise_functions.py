@@ -41,8 +41,8 @@ def MPC_parser(mpc_file):
     """
 
     read_file = pd.read_csv(mpc_file)
-    read_file.to_csv('data/mpc_file.csv', index=None)
-    csv_url = 'data/mpc_file.csv'
+    read_file.to_csv('generated_data/mpc_file.csv', index=None)
+    csv_url = 'generated_data/mpc_file.csv'
     dates = []
     ids = []
     obs_ids = []
