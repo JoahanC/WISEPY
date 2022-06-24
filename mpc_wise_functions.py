@@ -181,3 +181,14 @@ def comparer(mpc_file, wise_file, stats):
             print(f"{epoch}", '|', f"{new_epochs[epoch][0]}" )
 
     return new_epochs
+
+
+def generate_source_ids(mpc_file, wise_file):
+    """
+    Generates a list of unique source_ids
+    """
+    new_epochs = comparer(mpc_file, wise_file, False)
+    source_ids = []
+    for epoch in new_epochs:
+        source_ids.append(new_epochs[epoch][0][:9])
+    return source_ids
