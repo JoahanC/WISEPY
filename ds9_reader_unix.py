@@ -2,6 +2,7 @@
 from mpc_wise_functions import *
 import os
 import re
+import sys
 
 
 def make_region(file, w_band, source_ids):
@@ -23,12 +24,12 @@ def make_region(file, w_band, source_ids):
         file.write(f'circle({source_ids[sid][0]},{source_ids[sid][1]},15.000")')
 
 
-def data_sort(source_ids, new_epochs):
+def data_sort(source_ids):
     """
     The sorting algorithm for a given object's dataset.
     """
     
-    files = os.listdir("WISE_Files/")
+    files = os.listdir("wise_images/161989/")
     to_run = []
     for file in files:
         if file[:9] in source_ids:
@@ -95,23 +96,26 @@ def data_sort(source_ids, new_epochs):
     # Renaming files to correct directory
     renamed_sorted_run = []
     for file in w_sorted:
-        renamed_sorted_run.append("WISE_Files/" + file)
+        renamed_sorted_run.append("wise_images/161989/" + file)
 
     return renamed_sorted_run
 
-
-mpc_file = "input_data/161989.txt"
-wise_file = "input_data/161989.tbl"
-new_epochs = comparer(mpc_file, wise_file, True)
+new_epochs = comparer(sys.argv[1], sys.argv[2], False)
 source_ids = []
 for epoch in new_epochs:
     source_ids.append(new_epochs[epoch][0][:9])
-    
-renamed_sorted_run = data_sort(source_ids, new_epochs)
+
+renamed_sorted_run = data_sort(source_ids)
+file_region = {}
+for file in renamed_sorted_run:
+    sid = file[13 + len(sys.argv[3]):22 + len(sys.argv[3])]
+    band = file[23 + len(sys.argv[3]):25 + len(sys.argv[3])]
+    file_region[file] = f"regions/{sid}_{band}.reg"
 
 run_string = "ds9 -scale log -tile "
-for file in renamed_sorted_run[:10]:
+for file in list(file_region.keys())[:50]:
     run_string += file + ' -regions '
-    reg_string = "regions/" + file[11:20] + '_' + file[21:23] + ".reg"
+    reg_string = file_region[file]
     run_string += reg_string + ' '
+run_string += ' -zmax'
 os.popen(run_string)
