@@ -27,6 +27,9 @@ def make_region(file, w_band, source_ids):
 def data_sort(source_ids):
     """
     The sorting algorithm for a given object's dataset.
+    Arguments: source_ids (list) - a list of all unique epoch source ids.
+    Returns: (list) - a sorted list of files corresponding to the source ids
+             provided.
     """
     
     files = os.listdir("wise_images/161989/")
@@ -101,7 +104,14 @@ def data_sort(source_ids):
     return renamed_sorted_run
 
 
-def generate_script(source_ids):
+def generate_script(source_ids, lower_bound, upper_bound):
+    """
+    Generates the ds9 script for running ds9_viewer.py.
+    Arguments: source_ids (list) - A list of all relevant source ids to run
+               lower_bound (int) - the initial index to load from the ids
+               upperbound (int) - the ending index to load from the ids
+    Returns: (str) - a set of ds9 commands to run in the terminal
+    """
     sorted_files = data_sort(source_ids)
 
     file_region = {}
@@ -111,29 +121,9 @@ def generate_script(source_ids):
         file_region[file] = f"regions/{sid}_{band}.reg"
 
     run_string = "ds9 -scale log -tile "
-    for file in list(file_region.keys())[:50]:
+    for file in list(file_region.keys())[lower_bound:upper_bound]:
         run_string += file + ' -regions '
         reg_string = file_region[file]
         run_string += reg_string + ' '
     run_string += ' -zmax'
     return run_string
-"""
-mpc_file = "input_data/" + sys.argv[1] + ".txt"
-wise_file = "input_data/" + sys.argv[1] + ".tbl"
-
-source_ids = generate_source_ids(mpc_file, wise_file)
-
-renamed_sorted_run = data_sort(source_ids)
-file_region = {}
-for file in renamed_sorted_run:
-    sid = file[13 + len(sys.argv[1]):22 + len(sys.argv[1])]
-    band = file[23 + len(sys.argv[1]):25 + len(sys.argv[1])]
-    file_region[file] = f"regions/{sid}_{band}.reg"
-
-run_string = "ds9 -scale log -tile "
-for file in list(file_region.keys())[:50]:
-    run_string += file + ' -regions '
-    reg_string = file_region[file]
-    run_string += reg_string + ' '
-run_string += ' -zmax'
-os.popen(run_string)"""
