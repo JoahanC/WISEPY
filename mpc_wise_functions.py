@@ -59,7 +59,7 @@ def MPC_parser(mpc_file):
             row_string = row_string[8:]
             elements = row_string.split()
             day = elements[0]
-            dec_day = day[2:]
+            dec_day = day[2:9]
             time_string = decimal_day_converter(dec_day)
             day = day[:2]
             date = year+'-'+month+'-'+day+time_string
