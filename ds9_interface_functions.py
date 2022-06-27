@@ -88,10 +88,10 @@ def data_sort(source_ids, mpc_code):
 
     # W band sort
     idx = list(range(len(sorted_run)))[::2]
-
     w_sorted = []
     for i in idx:
         pair = (sorted_run[i], sorted_run[i + 1])
+        print(pair)
         if pair[0][10:12] == "w1":
             w_sorted.extend([pair[0], pair[1]])
         else:
@@ -136,6 +136,7 @@ def generate_script(source_ids, lower_bound, upper_bound, mpc_code):
 
     run_string = "ds9 -scale log -tile "
     for file in list(file_region.keys())[lower_bound:upper_bound]:
+        #print(file)
         run_string += file + ' -regions '
         reg_string = file_region[file]
         run_string += reg_string + ' '
