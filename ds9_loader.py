@@ -1,3 +1,4 @@
+from mpc_wise_comparer import comparer
 import os
 import sys
 
@@ -13,6 +14,9 @@ for stub in file_stubs:
     for file in wise_files:
         if file[:9] == stub:
             run_files.append(file)
+
+
+#new_epochs = comparer
 
 ds9_script = "ds9 -tile "
 for file in run_files:
