@@ -25,7 +25,7 @@ def make_region(file, source_ids, mpc_code):
         file.write(f'circle({source_ids[sid][0]},{source_ids[sid][1]},15.000")')
 
 
-def data_sort(source_ids, mpc_code):
+def data_sort(source_ids, mpc_code, bands=2):
     """
     The sorting algorithm for a given object's dataset.
     Arguments: source_ids (list) - a list of all unique epoch source ids.
@@ -80,32 +80,84 @@ def data_sort(source_ids, mpc_code):
 
         number_sorted[number] = matches
 
-    # Putting sorted files into run list
     sorted_run = []
     for number in number_sorted:
-        for file in number_sorted[number]:
-            sorted_run.append(file)
+        a_temp = {}
+        b_temp = {}
+        for elem in number_sorted[number]:
+            if elem[5] == 'a':
+                if elem[6:9] not in a_temp.keys():
+                    a_temp[elem[6:9]] = [elem]
+                else:
+                    a_temp[elem[6:9]].append(elem)
+            else:
+                if elem[6:9] not in b_temp.keys():
+                    b_temp[elem[6:9]] = [elem]
+                else:
+                    b_temp[elem[6:9]].append(elem)
+        a_keys = list(a_temp.keys())
+        b_keys = list(b_temp.keys())
+        a_keys.sort()
+        b_keys.sort()
+        for key in a_keys:
+            for elem in a_temp[key]:
+                sorted_run.append(elem)
+        for key in b_keys:
+            for elem in b_temp[key]:
+                sorted_run.append(elem)
 
     # W band sort
-    idx = list(range(len(sorted_run)))[::2]
-    w_sorted = []
-    for i in idx:
-        pair = (sorted_run[i], sorted_run[i + 1])
-        print(pair)
-        if pair[0][10:12] == "w1":
-            w_sorted.extend([pair[0], pair[1]])
-        else:
-            w_sorted.extend([pair[1], pair[0]])
+    if bands == 4:
+        idx = list(range(len(sorted_run)))[::4]
+        w_sorted = []
+        for i in idx:
+            quartet = {int(sorted_run[i][11]) : sorted_run[i], 
+               int(sorted_run[i+1][11]): sorted_run[i+1], 
+               int(sorted_run[i+2][11]): sorted_run[i+2], 
+               int(sorted_run[i+3][11]): sorted_run[i+3]}
+            for i in range(1, 5):
+                w_sorted.append(quartet[i])
 
-    # Renaming files to correct directory
-    renamed_sorted_run = []
-    for file in w_sorted:
-        renamed_sorted_run.append("wise_images/" + mpc_code + '/' + file)
+        # Renaming files to correct directory
+        renamed_sorted_run = []
+        for file in w_sorted:
+            renamed_sorted_run.append("wise_images/" + mpc_code + '/' + file)
+        return renamed_sorted_run
+    
+    if bands == 3:
+        idx = list(range(len(sorted_run)))[::3]
+        w_sorted = []
+        for i in idx:
+            triplet = {int(sorted_run[i][11]) : sorted_run[i], 
+               int(sorted_run[i+1][11]): sorted_run[i+1], 
+               int(sorted_run[i+2][11]): sorted_run[i+2]}
+            for i in range(1, 4):
+                w_sorted.append(triplet[i])
 
-    return renamed_sorted_run
+        # Renaming files to correct directory
+        renamed_sorted_run = []
+        for file in w_sorted:
+            renamed_sorted_run.append("wise_images/" + mpc_code + '/' + file)
+
+        return renamed_sorted_run
+
+    if bands == 2:
+        idx = list(range(len(sorted_run)))[::2]
+        w_sorted = []
+        for i in idx:
+            pair = {int(sorted_run[i][11]) : sorted_run[i], 
+               int(sorted_run[i+1][11]): sorted_run[i+1]}
+            for i in range(1, 3):
+                w_sorted.append(pair[i])
+        # Renaming files to correct directory
+        renamed_sorted_run = []
+        for file in w_sorted:
+            renamed_sorted_run.append("wise_images/" + mpc_code + '/' + file)
+
+        return renamed_sorted_run
 
 
-def generate_script(source_ids, lower_bound, upper_bound, mpc_code):
+def generate_script(source_ids, lower_bound, upper_bound, mpc_code, bands=2):
     """
     Generates the ds9 script for running ds9_viewer.py.
     Arguments: source_ids (list) - A list of all relevant source ids to run
@@ -113,16 +165,23 @@ def generate_script(source_ids, lower_bound, upper_bound, mpc_code):
                upperbound (int) - the ending index to load from the ids
     Returns: (str) - a set of ds9 commands to run in the terminal
     """
-    sorted_files = data_sort(source_ids, mpc_code)
+    sorted_files = data_sort(source_ids, mpc_code, bands)
 
     region_files = os.listdir("regions")
     for file in region_files:
         os.remove("regions/" + file)
 
-    mpc_file = "input_data/" + sys.argv[1] + ".txt"
-    wise_file = "input_data/" + sys.argv[1] + ".tbl"
+    if bands == 2:
+        mpc_file = "input_data/" + mpc_code + ".txt"
+        wise_file = "input_data/" + mpc_code + ".tbl"
+    if bands == 3:
+        mpc_file = "input_data/" + mpc_code + ".txt"
+        wise_file = "input_data/" + mpc_code + "_3band.tbl"
+    if bands == 4:
+        mpc_file = "input_data/" + mpc_code + ".txt"
+        wise_file = "input_data/" + mpc_code + "_cryo.tbl"
 
-    lookup_table = generate_source_ids_dict(mpc_file, wise_file)
+    lookup_table = generate_source_ids_dict(mpc_file, wise_file, bands)
 
     for file in sorted_files:
         sid = file[13 + len(mpc_code):22 + len(mpc_code)]
@@ -136,7 +195,7 @@ def generate_script(source_ids, lower_bound, upper_bound, mpc_code):
 
     run_string = "ds9 -scale log -tile "
     for file in list(file_region.keys())[lower_bound:upper_bound]:
-        #print(file)
+        print(file)
         run_string += file + ' -regions '
         reg_string = file_region[file]
         run_string += reg_string + ' '

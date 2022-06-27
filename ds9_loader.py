@@ -4,7 +4,7 @@ import os
 import sys
 
 
-def load_files(load_file, mpc_code):
+def load_files(load_file, mpc_code, bands=2):
     file_stubs = []
     with open(f"loader_data/{load_file}", 'r') as file:
         for line in file:
@@ -26,10 +26,17 @@ def load_files(load_file, mpc_code):
         else:
             w_sorted.extend([pair[1], pair[0]])
 
-
-    mpc_file = "input_data/" + mpc_code + ".txt"
-    wise_file = "input_data/" + mpc_code + ".tbl"
-    new_epochs = comparer(mpc_file, wise_file, False)
+    if bands == 2:
+        mpc_file = "input_data/" + mpc_code + ".txt"
+        wise_file = "input_data/" + mpc_code + ".tbl"
+    if bands == 3:
+        mpc_file = "input_data/" + mpc_code + ".txt"
+        wise_file = "input_data/" + mpc_code + "_3band.tbl"
+    if bands == 4:
+        mpc_file = "input_data/" + mpc_code + ".txt"
+        wise_file = "input_data/" + mpc_code + "_cryo.tbl"
+    
+    new_epochs = comparer(mpc_file, wise_file, False, bands)
     good_epochs = {}
     for epoch in new_epochs:
         sid = new_epochs[epoch][0][:9]
@@ -37,17 +44,46 @@ def load_files(load_file, mpc_code):
             if stub == sid:
                 good_epochs[sid] = new_epochs[epoch]
                 good_epochs[sid][0] = epoch    
-    
-    print('-' * 65)
-    print("| Frame | Source Id | W1 Flux  | W1 Sigma | W2 Flux  | W2 Sigma |")
-    print('-' * 65)
-    for idx, epoch in enumerate(good_epochs):
-        print('|' + f"{idx + 1}".rjust(6) + f" | {epoch}" 
-              + ' | ' + f"{good_epochs[epoch][4]}".rjust(8) 
-              + ' | ' + f"{good_epochs[epoch][5]}".rjust(8) 
-              + ' | ' + f"{good_epochs[epoch][6]}".rjust(8)
-              + ' | ' + f"{good_epochs[epoch][7]}".rjust(8) + ' | ')
-    print('-' * 65)
+    if bands == 2:
+        print('-' * 65)
+        print("| Frame | Source Id | W1 Flux  | W1 Sigma | W2 Flux  | W2 Sigma |")
+        print('-' * 65)
+        for idx, epoch in enumerate(good_epochs):
+            print('|' + f"{idx + 1}".rjust(6) + f" | {epoch}" 
+                + ' | ' + f"{good_epochs[epoch][4]}".rjust(8) 
+                + ' | ' + f"{good_epochs[epoch][5]}".rjust(8) 
+                + ' | ' + f"{good_epochs[epoch][6]}".rjust(8)
+                + ' | ' + f"{good_epochs[epoch][7]}".rjust(8) + ' | ')
+        print('-' * 65)
+    if bands == 3:
+        print('-' * 65)
+        print("| Frame | Source Id | W1 Flux  | W1 Sigma | W2 Flux  | W2 Sigma |")
+        print('-' * 65)
+        for idx, epoch in enumerate(good_epochs):
+            print('|' + f"{idx + 1}".rjust(6) + f" | {epoch}" 
+                + ' | ' + f"{good_epochs[epoch][4]}".rjust(8) 
+                + ' | ' + f"{good_epochs[epoch][5]}".rjust(8) 
+                + ' | ' + f"{good_epochs[epoch][6]}".rjust(8)
+                + ' | ' + f"{good_epochs[epoch][7]}".rjust(8)
+                + ' | ' + f"{good_epochs[epoch][8]}".rjust(8)
+                + ' | ' + f"{good_epochs[epoch][9]}".rjust(8) + ' | ')
+        print('-' * 65)
+        print('-' * 65)
+    if bands == 4:
+        print('-' * 65)
+        print("| Frame | Source Id | W1 Flux  | W1 Sigma | W2 Flux  | W2 Sigma |")
+        print('-' * 65)
+        for idx, epoch in enumerate(good_epochs):
+            print('|' + f"{idx + 1}".rjust(6) + f" | {epoch}" 
+                + ' | ' + f"{good_epochs[epoch][4]}".rjust(8) 
+                + ' | ' + f"{good_epochs[epoch][5]}".rjust(8) 
+                + ' | ' + f"{good_epochs[epoch][6]}".rjust(8)
+                + ' | ' + f"{good_epochs[epoch][7]}".rjust(8)
+                + ' | ' + f"{good_epochs[epoch][8]}".rjust(8)
+                + ' | ' + f"{good_epochs[epoch][9]}".rjust(8)
+                + ' | ' + f"{good_epochs[epoch][10]}".rjust(8)
+                + ' | ' + f"{good_epochs[epoch][11]}".rjust(8) + ' | ')
+        print('-' * 65)
 
     region_list = []
     for file in w_sorted:
@@ -68,4 +104,4 @@ def load_files(load_file, mpc_code):
     os.popen(ds9_script)
 
 
-load_files(sys.argv[1], sys.argv[2])
+load_files(sys.argv[1], sys.argv[2], sys.argv[3])

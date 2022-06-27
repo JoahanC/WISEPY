@@ -75,7 +75,33 @@ def MPC_parser(mpc_file):
     return observations
 
 
-def WISE_parser(wise_file):
+def pull_bands(data_object, bands):
+    
+    w1_flux = list(data_object['w1flux'])
+    w1_flux_sigma = list(data_object['w1sigflux'])
+    w2_flux = list(data_object['w2flux'])
+    w2_flux_sigma = list(data_object['w2sigflux'])
+    if bands == 2:
+        return (w1_flux, w1_flux_sigma,
+               w2_flux, w2_flux_sigma)
+    if bands == 3:
+        w3_flux = list(data_object['w3flux'])
+        w3_flux_sigma = list(data_object['w3sigflux'])
+        return (w1_flux, w1_flux_sigma,
+               w2_flux, w2_flux_sigma,
+               w3_flux, w3_flux_sigma)
+    if bands == 4:
+        w3_flux = list(data_object['w3flux'])
+        w3_flux_sigma = list(data_object['w3sigflux'])
+        w4_flux = list(data_object['w4flux'])
+        w4_flux_sigma = list(data_object['w4sigflux'])
+        return (w1_flux, w1_flux_sigma,
+               w2_flux, w2_flux_sigma,
+               w3_flux, w3_flux_sigma,
+               w4_flux, w4_flux_sigma)
+
+
+def WISE_parser(wise_file, bands=2):
     """
     Parses a tbl file containing WISE image data that returns source ids, utc,
     and jd time values.
@@ -92,21 +118,32 @@ def WISE_parser(wise_file):
     source_ids = list(data_object['source_id'])
     ra = list(data_object['ra'])
     dec = list(data_object['dec'])
-    w1_flux = list(data_object['w1flux'])
-    w1_flux_sigma = list(data_object['w1sigflux'])
-    w2_flux = list(data_object['w2flux'])
-    w2_flux_sigma = list(data_object['w2sigflux'])
-
+    fluxes = pull_bands(data_object, bands)
+    
     time_object = Time(dates, format='mjd', scale='utc')
     julian_dates = time_object.jd
     utc_dates = time_object.isot
 
     images = {}
     for idx, date in enumerate(utc_dates):
-        images[str(date)] = [source_ids[idx], julian_dates[idx], 
-                             ra[idx], dec[idx], 
-                             w1_flux[idx], w1_flux_sigma[idx], 
-                             w2_flux[idx], w2_flux_sigma[idx]]
+        if bands == 2:
+            images[str(date)] = [source_ids[idx], julian_dates[idx], 
+                                ra[idx], dec[idx], 
+                                fluxes[0][idx], fluxes[1][idx], 
+                                fluxes[2][idx], fluxes[3][idx]]
+        if bands == 3:
+            images[str(date)] = [source_ids[idx], julian_dates[idx], 
+                                ra[idx], dec[idx], 
+                                fluxes[0][idx], fluxes[1][idx], 
+                                fluxes[2][idx], fluxes[3][idx],
+                                fluxes[4][idx], fluxes[5][idx]]
+        if bands == 4:
+            images[str(date)] = [source_ids[idx], julian_dates[idx], 
+                                ra[idx], dec[idx], 
+                                fluxes[0][idx], fluxes[1][idx], 
+                                fluxes[2][idx], fluxes[3][idx],
+                                fluxes[4][idx], fluxes[5][idx],
+                                fluxes[6][idx], fluxes[7][idx]]
     return images
 
 def n_round(x, n=5):
@@ -119,7 +156,7 @@ def n_round(x, n=5):
     return n * round(x/n)
 
 
-def comparer(mpc_file, wise_file, stats):
+def comparer(mpc_file, wise_file, stats, bands=2):
     """
     Compares the observational instances between the MPC and WISE dataset files for a given object. 
     Arguments: mpc_file (str) -- txt file which contains MPC data
@@ -127,7 +164,7 @@ def comparer(mpc_file, wise_file, stats):
     """
     
     mpc_observation_data = MPC_parser(mpc_file)
-    wise_image_data = WISE_parser(wise_file)
+    wise_image_data = WISE_parser(wise_file, bands)
     
     # Year Counting
     wise_years = []
@@ -190,18 +227,19 @@ def comparer(mpc_file, wise_file, stats):
     return new_epochs
 
 
-def generate_source_ids_list(mpc_file, wise_file):
+def generate_source_ids_list(mpc_file, wise_file, bands):
     """
     Generates a list of unique source_ids
     """
-    new_epochs = comparer(mpc_file, wise_file, False)
+    new_epochs = comparer(mpc_file, wise_file, False, bands)
     source_ids = []
     for epoch in new_epochs:
         source_ids.append(new_epochs[epoch][0][:9])
+    print(source_ids)
     return source_ids
 
-def generate_source_ids_dict(mpc_file, wise_file):
-    new_epochs = comparer(mpc_file, wise_file, False)
+def generate_source_ids_dict(mpc_file, wise_file, bands):
+    new_epochs = comparer(mpc_file, wise_file, False, bands)
     wise_data = WISE_parser(wise_file)
 
     data_object = Table.read(wise_file, format='ipac')
