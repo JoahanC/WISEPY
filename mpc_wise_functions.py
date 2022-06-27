@@ -92,6 +92,10 @@ def WISE_parser(wise_file):
     source_ids = list(data_object['source_id'])
     ra = list(data_object['ra'])
     dec = list(data_object['dec'])
+    w1_flux = list(data_object['w1flux'])
+    w1_flux_sigma = list(data_object['w1sigflux'])
+    w2_flux = list(data_object['w2flux'])
+    w2_flux_sigma = list(data_object['w2sigflux'])
 
     time_object = Time(dates, format='mjd', scale='utc')
     julian_dates = time_object.jd
@@ -99,7 +103,10 @@ def WISE_parser(wise_file):
 
     images = {}
     for idx, date in enumerate(utc_dates):
-        images[str(date)] = [source_ids[idx], julian_dates[idx], ra[idx], dec[idx]]
+        images[str(date)] = [source_ids[idx], julian_dates[idx], 
+                             ra[idx], dec[idx], 
+                             w1_flux[idx], w1_flux_sigma[idx], 
+                             w2_flux[idx], w2_flux_sigma[idx]]
     return images
 
 def n_round(x, n=5):
