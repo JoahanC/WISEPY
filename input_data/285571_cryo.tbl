@@ -1,0 +1,130 @@
+\fixlen = T
+\RowsRetrieved = 9
+\ORIGIN = IPAC Infrared Science Archive (IRSA), Caltech/JPL
+\SIMULATED_TABLE = n
+\DATETIME = 2022-06-28 13:28:39
+\DataTag = ADS/IRSA.Gator#2022/0628/132839_22111
+\DATABASE = WISE All-Sky Single Exposure (L1b) Source Table (allsky_4band_p1bs_psd)
+\EQUINOX = J2000
+\NOTE = Column names with suffix _u are from the moving object seed list file .
+\NOTE = Column cntr_u is a sequential counter added to ID each row in the moving object seed list .
+\NOTE = dist is the distance in arcsec between each moving object source and its potential match in the WISE All-Sky Single Exposure (L1b) Source Table.
+\NOTE = 'pang is position angle, measured eastward from north, between the input source and potential match in the WISE All-Sky Single Exposure (L1b) Source Table.
+\NOTE = Output rows are ordered by increasing cntr_u, and for each cntr_u by increasing dist.
+\StatusFile = /workspace/TMP_53WvFC_18601/Gator/irsa/22111/log.22111.html
+\SQL = WHERE  (A.cntr_u = B.cntr_x) and (((B.x-A.x_u)*(B.x-A.x_u)+(B.y-A.y_u)*(B.y-A.y_u)+(B.z-A.z_u)*(B.z-A.z_u)) 
+\SQL = SELECT (47 column names follow in next row.)
+\ 
+\ Cont.  = '<= 5.87610763448673319e-10d) and A.scan_id_u=B.scan_id and A.frame_num_u=B.frame_num '
+\ 
+\ cntr_u
+\ ___ entry counter (key) number (unique within table)
+\ ra (deg)
+\ ___ right ascension (J2000)
+\ dec (deg)
+\ ___ declination (J2000)
+\ sigra (arcsec)
+\ ___ uncertainty in RA
+\ sigdec (arcsec)
+\ ___ uncertainty in DEC
+\ sigradec (arcsec)
+\ ___ uncertainty cross-term
+\ source_id
+\ ___ unique source ID (scan ID, frame num, and source number)
+\ w1mpro (mag)
+\ ___ instrumental profile-fit photometry magnitude, band 1
+\ w1sigmpro (mag)
+\ ___ instrumental profile-fit photometry flux uncertainty in mag units, band 1
+\ w1snr
+\ ___ instrumental profile-fit photometry S/N ratio, band 1
+\ w1rchi2
+\ ___ instrumental profile-fit photometry reduced chi^2, band 1
+\ w2mpro (mag)
+\ ___ instrumental profile-fit photometry magnitude, band 2
+\ w2sigmpro (mag)
+\ ___ instrumental profile-fit photometry flux uncertainty in mag units, band 2
+\ w2snr
+\ ___ instrumental profile-fit photometry S/N ratio, band 2
+\ w2rchi2
+\ ___ instrumental profile-fit photometry reduced chi^2, band 2
+\ w3mpro (mag)
+\ ___ instrumental profile-fit photometry magnitude, band 3
+\ w3sigmpro (mag)
+\ ___ instrumental profile-fit photometry flux uncertainty in mag units, band 3
+\ w3snr
+\ ___ instrumental profile-fit photometry S/N ratio, band 3
+\ w3rchi2
+\ ___ instrumental profile-fit photometry reduced chi^2, band 3
+\ w4mpro (mag)
+\ ___ instrumental profile-fit photometry magnitude, band 4
+\ w4sigmpro (mag)
+\ ___ instrumental profile-fit photometry flux uncertainty in mag units, band 4
+\ w4snr
+\ ___ instrumental profile-fit photometry S/N ratio, band 4
+\ w4rchi2
+\ ___ instrumental profile-fit photometry reduced chi^2, band 4
+\ nb
+\ ___ number of blend components used in each fit
+\ na
+\ ___ active deblend flag (=1 if actively deblended)
+\ w1sat
+\ ___ fraction of pixels saturated, band 1
+\ w2sat
+\ ___ fraction of pixels saturated, band 2
+\ w3sat
+\ ___ fraction of pixels saturated, band 3
+\ w4sat
+\ ___ fraction of pixels saturated, band 4
+\ cc_flags
+\ ___ prioritized artifacts affecting the source in each band
+\ ph_qual
+\ ___ photometric quality of each band (A=highest, U=upper limit)
+\ sso_flg
+\ ___ known solar system object association flag (0=no association, >0=association)
+\ mjd (mjdate)
+\ ___ modified Julian date of the mid-point of the observation of the frame
+\ w1flux (dn)
+\ ___ profile-fit photometry raw flux, band 1
+\ w1sigflux (dn)
+\ ___ profile-fit photometry raw flux uncertainty, band 1
+\ w2flux (dn)
+\ ___ profile-fit photometry raw flux, band 2
+\ w2sigflux (dn)
+\ ___ profile-fit photometry raw flux uncertainty, band 2
+\ w3flux (dn)
+\ ___ profile-fit photometry raw flux, band 3
+\ w3sigflux (dn)
+\ ___ profile-fit photometry raw flux uncertainty, band 3
+\ w4flux (dn)
+\ ___ profile-fit photometry raw flux, band 4
+\ w4sigflux (dn)
+\ ___ profile-fit photometry raw flux uncertainty, band 4
+\ tmass_key
+\ ___ closest associated 2MASS All-Sky Release PSC key
+\ j_m_2mass (mag)
+\ ___ J magnitude entry of the associated 2MASS All-Sky PSC source
+\ j_msig_2mass (mag)
+\ ___ J photometric uncertainty of the associated 2MASS All-Sky PSC source
+\ h_m_2mass (mag)
+\ ___ H magnitude entry of the associated 2MASS All-Sky PSC source
+\ h_msig_2mass (mag)
+\ ___ H photometric uncertainty of the associated 2MASS All-Sky PSC source
+\ k_m_2mass (mag)
+\ ___ Ks magnitude entry of the associated 2MASS All-Sky PSC source
+\ k_msig_2mass (mag)
+\ ___ Ks photometric uncertainty of the associated 2MASS All-Sky PSC source
+\ 
+\
+|cntr_u|dist_x  |pang_x     |ra_u            |dec_u           |ra         |dec      |sigra |sigdec|sigradec|source_id       |w1mpro|w1sigmpro|w1snr |w1rchi2  |w2mpro|w2sigmpro|w2snr |w2rchi2  |w3mpro|w3sigmpro|w3snr |w3rchi2  |w4mpro|w4sigmpro|w4snr |w4rchi2  |nb  |na  |w1sat |w2sat |w3sat |w4sat |cc_flags|ph_qual|sso_flg|mjd         |w1flux     |w1sigflux |w2flux     |w2sigflux |w3flux    |w3sigflux |w4flux     |w4sigflux |tmass_key|j_m_2mass|j_msig_2mass|h_m_2mass|h_msig_2mass|k_m_2mass|k_msig_2mass|
+|long  |double  |double     |double          |double          |double     |double   |double|double|double  |char            |double|double   |double|double   |double|double   |double|double   |double|double   |double|double   |double|double   |double|double   |int |int |double|double|double|double|char    |char   |int    |double      |double     |double    |double     |double    |double    |double    |double     |double    |int      |double   |double      |double   |double      |double   |double      |
+|      |arcsec  |deg        |                |                |deg        |deg      |arcsec|arcsec|arcsec  |                |mag   |mag      |      |         |mag   |mag      |      |         |mag   |mag      |      |         |mag   |mag      |      |         |    |    |      |      |      |      |        |       |       |mjdate      |dn         |dn        |dn         |dn        |dn        |dn        |dn         |dn        |         |mag      |mag         |mag      |mag         |mag      |mag         |
+|null  |null    |null       |null            |null            |null       |null     |null  |null  |null    |null            |null  |null     |null  |null     |null  |null     |null  |null     |null  |null     |null  |null     |null  |null     |null  |null     |null|null|null  |null  |null  |null  |null    |null   |null   |null        |null       |null      |null       |null      |null      |null      |null       |null      |null     |null     |null        |null     |null        |null     |null        |
+      2 1.258380  -28.359014 1.3574438000E+02 5.1212670000E+00 135.7442133 5.1215746 0.5501 0.6345   0.1048 04191a053-000974 14.964     0.105   10.4 9.573E-01 15.350     0.429    2.5 9.434E-01 10.876     0.359    3.0 1.131E+00  7.854      null   null 1.261E+00    1    0  0.000  0.000  0.000  0.000 0000     ACCU          1 55318.176292  2.0668E+02 1.9914E+01  4.9939E+01 1.9713E+01 5.8819E+02 1.9433E+02 -2.9003E+01 5.4356E+01 805758884    15.395        0.061    14.913        0.065    14.894        0.121 
+      3 1.724362  162.975554 1.3576233600E+02 5.1197680000E+00 135.7624768 5.1193100 1.6542 1.8555   0.6180 04194a134-002853 16.848      null    0.3 9.193E-01 15.657      null   null 7.189E-01 10.425     0.233    4.7 4.752E-01  7.205      null    1.7 8.920E-01    1    0  0.000  0.000  0.000  0.000 0000     UUBU          1 55318.308597  5.3235E+00 1.5565E+01 -1.3659E+01 1.8816E+01 8.9114E+02 1.9094E+02  9.0387E+01 5.3674E+01      null      null         null      null         null      null         null 
+     10 1.816924  -41.960290 1.3582602000E+02 5.1142370000E+00 135.8256812 5.1146123 1.4740 1.6417   0.2384 04209a111-002270 16.704     0.442    2.5 9.169E-01 15.628      null   null 1.099E+00 10.590     0.268    4.1 7.601E-01  7.852     0.524    2.1 1.353E+00    1    0  0.000  0.000  0.000  0.000 0000     CUBC          1 55318.771726  4.1611E+01 1.6953E+01 -2.3371E+00 1.9328E+01 7.6590E+02 1.8873E+02  1.0893E+02 5.2552E+01      null      null         null      null         null      null         null 
+     11 2.412407   -0.357680 1.3583521200E+02 5.1134220000E+00 135.8352078 5.1140921 1.4546 1.7087  -0.1863 04210a134-002107 16.469     0.345    3.1 1.266E+00 15.743      null   null 9.090E-01 10.810     0.307    3.5 7.795E-01  7.904      null   null 1.057E+00    1    0  0.000  0.000  0.000  0.000 0000     BUBU          1 55318.837814  5.1665E+01 1.6410E+01 -1.4081E+01 1.7385E+01 6.2531E+02 1.7684E+02 -3.9302E+01 5.1908E+01      null      null         null      null         null      null         null 
+     12 1.871605  -35.243109 1.3583523200E+02 5.1134050000E+00 135.8349308 5.1138296 1.9377 2.0514   0.4947 04210a135-003272 16.964      null   null 1.592E+00 15.541      null    0.2 9.713E-01 10.914     0.336    3.2 1.074E+00  7.593     0.476    2.3 1.385E+00    1    0  0.000  0.000  0.000  0.000 0000     UUBC          1 55318.837942 -1.3919E+01 1.6370E+01  3.5857E+00 1.9148E+01 5.6801E+02 1.7564E+02  1.3836E+02 6.0614E+01      null      null         null      null         null      null         null 
+     13 3.981250   44.911339 1.3584445000E+02 5.1125810000E+00 135.8452339 5.1133642 1.3781 1.4931   0.3972 04213a111-002963 17.012      null   null 1.547E+00 15.555      null   null 8.992E-01 10.448     0.243    4.5 1.885E+00  7.659     0.441    2.5 9.608E-01    1    0  0.000  0.000  0.000  0.000 0000     UUBC          1 55318.904030 -2.1821E+01 1.5671E+01 -4.9330E+01 2.0680E+01 8.7292E+02 1.9518E+02  1.3020E+02 5.2938E+01      null      null         null      null         null      null         null 
+     14 2.916192  -20.731879 1.3586298400E+02 5.1108900000E+00 135.8626961 5.1116476 1.3173 1.4458   0.3668 04217a111-001979 16.913     0.498    2.2 6.311E-01 15.102      null    1.1 9.155E-01 10.338     0.216    5.0 1.088E+00  7.621     0.424    2.6 8.122E-01    1    0  0.000  0.000  0.000  0.000 0000     CUBC          1 55319.036334  3.4339E+01 1.5743E+01  2.2277E+01 2.0242E+01 9.6589E+02 1.9235E+02  1.3472E+02 5.2673E+01      null      null         null      null         null      null         null 
+     15 1.651322 -160.503701 1.3588162200E+02 5.1091650000E+00 135.8814683 5.1087326 2.1118 2.2680   0.3784 04221a062-002651 17.023      null   null 1.372E+00 15.426      null    0.4 1.026E+00 10.681     0.289    3.8 6.639E-01  7.204      null    1.6 1.004E+00    1    0  0.000  0.000  0.000  0.000 0000     UUBU          1 55319.168638 -6.5043E+00 1.5514E+01  7.2607E+00 1.9645E+01 7.0409E+02 1.8758E+02  8.7102E+01 5.5359E+01      null      null         null      null         null      null         null 
+     16 1.389186  176.344652 1.3590036500E+02 5.1074040000E+00 135.9003897 5.1070189 1.6135 1.8147   0.3537 04225a111-003846 16.921      null   null 6.890E-01 14.939      null    1.5 1.278E+00 10.809     0.312    3.5 9.278E-01  7.237      null    1.7 5.993E-01    1    0  0.000  0.000  0.000  0.000 0000     UUBU          1 55319.300943 -3.4603E+01 1.7030E+01  3.1177E+01 2.0863E+01 6.2563E+02 1.7976E+02  8.7522E+01 5.2250E+01      null      null         null      null         null      null         null 
