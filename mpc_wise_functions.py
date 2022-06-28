@@ -235,7 +235,7 @@ def generate_source_ids_list(mpc_file, wise_file, bands):
     source_ids = []
     for epoch in new_epochs:
         source_ids.append(new_epochs[epoch][0][:9])
-    print(source_ids)
+    #print(source_ids)
     return source_ids
 
 def generate_source_ids_dict(mpc_file, wise_file, bands):

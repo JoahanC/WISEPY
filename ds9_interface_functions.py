@@ -195,7 +195,6 @@ def generate_script(source_ids, lower_bound, upper_bound, mpc_code, bands=2):
 
     run_string = "ds9 -scale log -tile "
     for file in list(file_region.keys())[lower_bound:upper_bound]:
-        print(file)
         run_string += file + ' -regions '
         reg_string = file_region[file]
         run_string += reg_string + ' '

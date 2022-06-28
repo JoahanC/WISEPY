@@ -83,7 +83,7 @@ def load_files(load_file, mpc_code, bands=2):
         print("| Frame | Source Id | W1 Flux  | W1 Sigma | W2 Flux  | W2 Sigma |")
         print('-' * 65)
         for idx, epoch in enumerate(good_epochs):
-            print('|' + f"{idx + 1}".rjust(6) + f" | {epoch}" 
+            print('|' + f"{idx * 2 + 1}-{idx * 2 + 2}".rjust(6) + f" | {epoch}" 
                 + ' | ' + f"{good_epochs[epoch][4]}".rjust(8) 
                 + ' | ' + f"{good_epochs[epoch][5]}".rjust(8) 
                 + ' | ' + f"{good_epochs[epoch][6]}".rjust(8)
