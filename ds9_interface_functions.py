@@ -51,6 +51,7 @@ def data_sort(source_ids, mpc_code, bands=2):
     key_sort = list(file_id.keys())
     key_sort.sort()
 
+
     number_sorted = {}
     for key in key_sort:
         for file in to_run:
@@ -61,8 +62,11 @@ def data_sort(source_ids, mpc_code, bands=2):
                 number_sorted[code] = [file]
             else:
                 pass
+    
+    #   BUG is below
 
     for number in number_sorted:
+        #print('All vals', number_sorted[number])
         regex = r"[0-9]{5}[a]"
         matches = []
         for test in number_sorted[number]:
@@ -70,8 +74,26 @@ def data_sort(source_ids, mpc_code, bands=2):
                 pass
             else:
                 matches.append(test)
-
+        #print('matches', matches)
         regex = r"[0-9]{5}[b]"
+        for test in number_sorted[number]:
+            if len(re.findall(regex, test)) == 0:
+                pass
+            else:
+                matches.append(test)
+        regex = r"[0-9]{5}[c]"
+        for test in number_sorted[number]:
+            if len(re.findall(regex, test)) == 0:
+                pass
+            else:
+                matches.append(test)
+        regex = r"[0-9]{5}[r]"
+        for test in number_sorted[number]:
+            if len(re.findall(regex, test)) == 0:
+                pass
+            else:
+                matches.append(test)
+        regex = r"[0-9]{5}[s]"
         for test in number_sorted[number]:
             if len(re.findall(regex, test)) == 0:
                 pass
@@ -79,6 +101,8 @@ def data_sort(source_ids, mpc_code, bands=2):
                 matches.append(test)
 
         number_sorted[number] = matches
+
+    #  BUG IS ABOVE
 
     sorted_run = []
     for number in number_sorted:
@@ -165,8 +189,9 @@ def generate_script(source_ids, lower_bound, upper_bound, mpc_code, bands=2):
                upperbound (int) - the ending index to load from the ids
     Returns: (str) - a set of ds9 commands to run in the terminal
     """
+    print(len(source_ids))
     sorted_files = data_sort(source_ids, mpc_code, bands)
-
+    print(len(sorted_files))
     region_files = os.listdir("regions")
     for file in region_files:
         os.remove("regions/" + file)
@@ -200,3 +225,23 @@ def generate_script(source_ids, lower_bound, upper_bound, mpc_code, bands=2):
         run_string += reg_string + ' '
     run_string += ' -zmax'
     return run_string
+
+
+def terminal_table(band_file_map, bands, good_epochs):
+
+    dash_string = '-' * 65 + '-' * band_file_map[bands][2]
+    test_string = "| Frame | Source Id "
+    for i in range(1, int(bands) + 1):
+        test_string += f"|  W{i} Flux | W{i} Sigma "
+    test_string += '|'
+    print(dash_string)
+    print(test_string)
+    print(dash_string)
+    for idx, epoch in enumerate(good_epochs):
+        epoch_string = '|' + f"{idx * 2 + 1}-{idx * 2 + 2}".rjust(6)
+        epoch_string += f" | {epoch}"
+        for i in range(int(bands) * 2):
+            epoch_string += ' | ' + f"{good_epochs[epoch][4 + i]}".rjust(8) 
+        epoch_string += " | "
+        print(epoch_string)
+    print(dash_string)
