@@ -75,7 +75,7 @@ def write_table(load_file, band_file_map, bands, mpc_code):
 
     sids = list(good_epochs.keys())
     for sid in sids:
-        print(sid)
+        print(sid, good_epochs[sid])
     
     big_list = []
     for i in range(int(bands) * 2):

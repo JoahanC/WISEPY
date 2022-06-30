@@ -1,5 +1,8 @@
 from ds9_interface_functions import write_epochs
+
 import os
+
+from epoch_JD_calendar import JD_plot
 
 
 files = os.listdir("loader_data")
@@ -18,4 +21,5 @@ for neo in epoch_files:
     for band in epoch_files[neo]:
         wise_file = f"input_data/{neo}{band_lookup[band]}"
         epoch_file = f"{neo}_{band}band.txt"
+        JD_plot(neo, band)
         write_epochs(wise_file, epoch_file, neo, band)
