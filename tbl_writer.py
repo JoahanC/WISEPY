@@ -1,5 +1,7 @@
 from astropy.table import Table
+from nbformat import write
 from mpc_wise_functions import comparer
+from ds9_interface_functions import data_sort
 import os
 import sys
 
@@ -53,9 +55,57 @@ def load_epochs(load_file, mpc_code, bands):
 
 
 
-def write_table(sorted_run, good_epochs):
-    name_list = [sys.argv[2]] * len(sorted_run)
-    dat = Table([name_list, sorted_run], names=["name", "source_id"])
-    dat.write(f"mcmc_inputs/{sys.argv[2]}_{sys.argv[3]}bands.tbl", 
+def write_table(load_file, band_file_map, bands, mpc_code):
+
+    file_stubs = []
+    with open(f"loader_data/{load_file}", 'r') as file:
+        for line in file:
+            file_stubs.append(line.rstrip())
+
+    mpc_file, wise_file = band_file_map[bands][0], band_file_map[bands][1]
+    new_epochs = comparer(mpc_file, wise_file, False, int(bands))
+
+    good_epochs = {}
+    for epoch in new_epochs:
+        sid = new_epochs[epoch][0][:9]
+        for stub in file_stubs:
+            if stub == sid:
+                good_epochs[sid] = new_epochs[epoch]
+                good_epochs[sid][0] = epoch   
+
+    sids = list(good_epochs.keys())
+    for sid in sids:
+        print(sid)
+    
+    big_list = []
+    for i in range(int(bands) * 2):
+        temp_list = []
+        for sid in sids:
+            temp_list.append(good_epochs[sid][4+i])
+        big_list.append(temp_list)
+    
+
+    idx_lookup = {-1: "source_id", 0: "w1flux", 1: "w1sigflux",
+                  2: "w2flux", 3: "w2sigflux",
+                  4: "w3flux", 5: "w3sigflux",
+                  6: "w4flux", 7: "w4sigflux"}
+    write_dict = {}
+    write_dict[idx_lookup[-1]] = sids
+
+    for i in range(int(bands) * 2):
+        write_dict[idx_lookup[i]] = []
+        for sid in sids:
+            write_dict[idx_lookup[i]].append(good_epochs[sid][4+i])
+    for key in write_dict:
+        print(key, write_dict[key])
+
+    for sid in good_epochs:
+        print(sid, good_epochs[sid])
+
+    first = list(write_dict.keys())
+    last = list(write_dict.values())
+
+    dat = Table(last, names=first)
+    dat.write(f"mcmc_inputs/{mpc_code}_{bands}bands.tbl", 
           format="ipac", overwrite=True)
 

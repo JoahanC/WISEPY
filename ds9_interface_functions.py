@@ -245,3 +245,20 @@ def terminal_table(band_file_map, bands, good_epochs):
         epoch_string += " | "
         print(epoch_string)
     print(dash_string)
+
+
+def write_epochs(wise_file, epoch_file, mpc_code, bands):
+
+    data_object = Table.read(wise_file, format='ipac')
+    sids = list(data_object['source_id'])
+    sids = [sid[0:9] for sid in sids]
+    file_stubs = []
+    with open(f"loader_data/{epoch_file}", 'r') as file:
+        for line in file:
+            file_stubs.append(line.rstrip())
+    data_object = data_object.group_by('source_id')
+    mask = np.isin(sids, file_stubs)
+    print(data_object.groups[mask])
+    dat = data_object.groups[mask]
+    dat.write(f"mcmc_inputs/{mpc_code}_{bands}bands.tbl", 
+          format="ipac", overwrite=True)
