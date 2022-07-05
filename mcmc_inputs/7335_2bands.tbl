@@ -1,0 +1,110 @@
+\ Cont.  = '<= 5.87610763448673319e-10d) and A.scan_id_u=B.scan_id and
+\ A.frame_num_u=B.frame_num '
+\ cntr_u
+\ ___ entry counter (key) number (unique within table)
+\ ra (deg)
+\ ___ right ascension (J2000)
+\ dec (deg)
+\ ___ declination (J2000)
+\ sigra (arcsec)
+\ ___ uncertainty in RA
+\ sigdec (arcsec)
+\ ___ uncertainty in DEC
+\ sigradec (arcsec)
+\ ___ uncertainty cross-term
+\ source_id
+\ ___ unique source ID (scan ID, frame num, and source number)
+\ w1mpro (mag)
+\ ___ instrumental profile-fit photometry magnitude, band 1
+\ w1sigmpro (mag)
+\ ___ instrumental profile-fit photometry flux uncertainty in mag units, band 1
+\ w1snr
+\ ___ instrumental profile-fit photometry S/N ratio, band 1
+\ w1rchi2
+\ ___ instrumental profile-fit photometry reduced chi^2, band 1
+\ w2mpro (mag)
+\ ___ instrumental profile-fit photometry magnitude, band 2
+\ w2sigmpro (mag)
+\ ___ instrumental profile-fit photometry flux uncertainty in mag units, band 2
+\ w2snr
+\ ___ instrumental profile-fit photometry S/N ratio, band 2
+\ w2rchi2
+\ ___ instrumental profile-fit photometry reduced chi^2, band 2
+\ nb
+\ ___ number of blend components used in each fit
+\ na
+\ ___ active deblend flag (=1 if actively deblended)
+\ cc_flags
+\ ___ prioritized artifacts affecting the source in each band
+\ ph_qual
+\ ___ photometric quality of each band (A=highest, U=upper limit)
+\ qual_frame
+\ ___ quality score value for frame
+\ mjd (mjdate)
+\ ___ modified Julian date of the mid-point of the observation of the frame
+\ w1flux (dn)
+\ ___ profile-fit photometry raw flux, band 1
+\ w1sigflux (dn)
+\ ___ profile-fit photometry raw flux uncertainty, band 1
+\ w2flux (dn)
+\ ___ profile-fit photometry raw flux, band 2
+\ w2sigflux (dn)
+\ ___ profile-fit photometry raw flux uncertainty, band 2
+\ allwise_cntr
+\ ___ closest associated ALLWISE Catalog source cntr
+\ w1mpro_allwise (mag)
+\ ___ W1mpro magnitude  of the associated ALLWISE source
+\ w1sigmpro_allwise (mag)
+\ ___ W1 photometric uncertainty of the associated ALLWISE  source
+\ w2mpro_allwise (mag)
+\ ___ W2mpro magnitude  of the associated ALLWISE  source
+\ w2sigmpro_allwise (mag)
+\ ___ W2 photometric uncertainty of the associated ALLWISE  source
+\ w3mpro_allwise (mag)
+\ ___ W3mpro magnitude  of the associated ALLWISE  source
+\ w3sigmpro_allwise (mag)
+\ ___ W3 photometric uncertainty of the associated ALLWISE source
+\ w4mpro_allwise (mag)
+\ ___ W4mpro magnitude  of the associated ALLWISE  source
+\ w4sigmpro_allwise (mag)
+\ ___ W4 photometric uncertainty of the associated ALLWISE  source
+\ tmass_key
+\ ___ closest associated 2MASS All-Sky Release PSC key
+\ j_m_2mass (mag)
+\ ___ J magnitude entry of the associated 2MASS All-Sky PSC source
+\ j_msig_2mass (mag)
+\ ___ J photometric uncertainty of the associated 2MASS All-Sky PSC source
+\ h_m_2mass (mag)
+\ ___ H magnitude entry of the associated 2MASS All-Sky PSC source
+\ h_msig_2mass (mag)
+\ ___ H photometric uncertainty of the associated 2MASS All-Sky PSC source
+\ k_m_2mass (mag)
+\ ___ Ks magnitude entry of the associated 2MASS All-Sky PSC source
+\ k_msig_2mass (mag)
+\ ___ Ks photometric uncertainty of the associated 2MASS All-Sky PSC source
+\fixlen='T'
+\RowsRetrieved=34
+\ORIGIN='IPAC Infrared Science Archive (IRSA), Caltech/JPL'
+\SIMULATED_TABLE='n'
+\DATETIME='2022-06-28 13:08:30'
+\DataTag='ADS/IRSA.Gator#2022/0628/130830_26669'
+\DATABASE='NEOWISE-R Single Exposure (L1b) Source Table (neowiser_p1bs_psd)'
+\EQUINOX='J2000'
+\NOTE="Column names with suffix _u are from the moving object seed list file .Column cntr_u is a sequential counter added to ID each row in the moving object seed list .dist is the distance in arcsec between each moving object source and its potential match in the NEOWISE-R Single Exposure (L1b) Source Table.'pang is position angle, measured eastward from north, between the input source and potential match in the NEOWISE-R Single Exposure (L1b) Source Table.Output rows are ordered by increasing cntr_u, and for each cntr_u by increasing dist."
+\StatusFile='/workspace/TMP_53WvFC_18601/Gator/irsa/26669/log.26669.html'
+\SQL='WHERE  (A.cntr_u = B.cntr_x) and (((B.x-A.x_u)*(B.x-A.x_u)+(B.y-A.y_u)*(B.y-A.y_u)+(B.z-A.z_u)*(B.z-A.z_u))SELECT (40 column names follow in next row.)'
+|cntr_u|  dist_x|    pang_x|      ra_u|     dec_u|         ra|        dec| sigra|sigdec|sigradec|       source_id|w1mpro|w1sigmpro| w1snr|w1rchi2|w2mpro|w2sigmpro| w2snr|w2rchi2|  nb|  na|cc_flags|ph_qual|qual_frame|           mjd|w1flux|w1sigflux|w2flux|w2sigflux|       allwise_cntr|w1mpro_allwise|w1sigmpro_allwise|w2mpro_allwise|w2sigmpro_allwise|w3mpro_allwise|w3sigmpro_allwise|w4mpro_allwise|w4sigmpro_allwise|tmass_key|j_m_2mass|j_msig_2mass|h_m_2mass|h_msig_2mass|k_m_2mass|k_msig_2mass|
+|  long|  double|    double|    double|    double|     double|     double|double|double|  double|            char|double|   double|double| double|double|   double|double| double|long|long|    char|   char|      long|        double|double|   double|double|   double|               long|        double|           double|        double|           double|        double|           double|        double|           double|     long|   double|      double|   double|      double|   double|      double|
+|      |  arcsec|       deg|          |          |        deg|        deg|arcsec|arcsec|  arcsec|                |   mag|      mag|      |       |   mag|      mag|      |       |    |    |        |       |          |        mjdate|    DN|       DN|    DN|       DN|                   |           mag|              mag|           mag|              mag|           mag|              mag|           mag|              mag|         |      mag|         mag|      mag|         mag|      mag|         mag|
+|  null|    null|      null|      null|      null|       null|       null|  null|  null|    null|            null|  null|     null|  null|   null|  null|     null|  null|   null|null|null|    null|   null|      null|          null|  null|     null|  null|     null|               null|          null|             null|          null|             null|          null|             null|          null|             null|     null|     null|        null|     null|        null|     null|        null|
+     38 0.406504  11.629029 298.606294 -14.403866 298.6063175 -14.4037554 0.2167 0.2489  -0.0869 59168a112-002323 15.953     0.238    4.6   1.179 13.078      0.07   15.5   1.037    1    0     0000      BA         10 57131.65485277 83.731    18.323 423.52    27.343                null           null              null           null              null           null              null           null              null      null      null         null      null         null      null         null 
+     39 0.325789 -12.358137 298.844435 -14.438779  298.844415 -14.4386906  0.227  0.299  -0.1198 59172a112-002016 15.502     0.165    6.6  0.7778 12.891     0.083   13.1  0.4592    1    0     0000      BA         10 57131.78613845  126.9    19.313 503.08    38.495 2989015201351060219         16.958             0.123         17.038             0.527         11.718              null          8.712              null      null      null         null      null         null      null         null 
+     42 0.857204  81.109387 299.322479 -14.508163  299.322722 -14.5081262 0.2458 0.2863  -0.0437 59180a113-002118 15.608      0.17    6.4  0.8477  12.99     0.083   13.1  0.8664    1    0     0000      BA         10  57132.0488377 115.09    18.027 459.19    35.023                null           null              null           null              null           null              null           null              null      null      null         null      null         null      null         null 
+     43 0.334281  36.232308 299.562123 -14.542707 299.5621797 -14.5426321 0.2881 0.3329  -0.1581 59184a113-002395 15.637     0.181    6.0  0.6196 13.189     0.093   11.6  0.8798    1    0     0000      BA         10 57132.18012338 112.03    18.727 382.22    32.835                null           null              null           null              null           null              null           null              null      null      null         null      null         null      null         null 
+     44 0.491398 124.952438 299.802263 -14.577123 299.8023786 -14.5772012 0.2562 0.2849   -0.062 59188a113-002306 15.363     0.138    7.9   1.717 13.184     0.089   12.2  0.9045    1    0     0000      BA         10 57132.31140906 144.12    18.275 384.19    31.473                null           null              null           null              null           null              null           null              null      null      null         null      null         null      null         null 
+     45 0.542405  -5.787573 299.922641 -14.594261 299.9226253 -14.5941111  0.226 0.2887  -0.1041 59189b138-003269 16.173     0.329    3.3  0.6067  13.08     0.078   13.9  0.8755    1    0     0000      BA         10 57132.37711559 68.353    20.711 422.75     30.32                null           null              null           null              null           null              null           null              null      null      null         null      null         null      null         null 
+     46 0.728377  81.702067 300.042896 -14.611408 300.0431029 -14.6113788 0.2509 0.2546  -0.0475 59192a113-002965 15.971     0.249    4.4   1.236 12.971     0.071   15.2  0.6037    1    0     0000      BA         10 57132.44269475 82.361    18.852 467.37    30.747                null           null              null           null              null           null              null           null              null      null      null         null      null         null      null         null 
+     57 0.662244  24.495177 301.618886 -14.830874 301.6189649 -14.8307066 0.2054 0.2345  -0.0861 59217b138-001794 15.247     0.139    7.8   1.025  12.94      0.08   13.5  0.6314    1    0     0000      BA         10  57133.2961206 160.41    20.502 480.86    35.521                null           null              null           null              null           null              null           null              null      null      null         null      null         null      null         null 
+     58 0.594147  87.777631 301.619133 -14.830832 301.6193036 -14.8308256 0.2025 0.2161  -0.0908 59217b139-001561 15.388     0.154    7.1  0.7322 12.873     0.067   16.2  0.5622    1    0     0000      BA         10 57133.29624793 140.93    19.967 511.65    31.551                null           null              null           null              null           null              null           null              null      null      null         null      null         null      null         null 
+     60 0.284192 105.804203 302.108015 -14.897121 302.1080936 -14.8971425  0.198 0.1903  -0.0747 59225b139-001465  15.42     0.147    7.4   1.222 12.748     0.059   18.5  0.3811    2    0     0000      BA         10  57133.5588195 136.79    18.491 573.73    31.084                null           null              null           null              null           null              null           null              null      null      null         null      null         null      null         null 
+     77 1.460116  14.650911  74.276146   9.125142  74.2762499   9.1255344 0.5563 0.5501  -0.2204 63481b168-003234 15.896       0.2    5.4   1.772 14.248      0.22    4.9  0.6811    1    0     0000      BB         10 57273.18428551 88.223    16.236 144.21    29.196                null           null              null           null              null           null              null           null              null      null      null         null      null         null      null         null 
