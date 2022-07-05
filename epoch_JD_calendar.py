@@ -4,6 +4,7 @@ import sys
 from mpc_wise_functions import *
 import matplotlib.pyplot as plt
 import numpy as np
+from astropy.time import Time
 
 
 def JD_plot(mpc_code, bands):
@@ -18,7 +19,8 @@ def JD_plot(mpc_code, bands):
 
     JD_xaxis = []
     for epoch in new_epochs:
-        JD_xaxis.append(new_epochs[epoch][1]) #appending each JD for each epoch in the new epochs dictionary
+        jd_time = Time(new_epochs[epoch][1], format="jd")
+        JD_xaxis.append(jd_time.mjd) #appending each JD for each epoch in the new epochs dictionary
    
     #Setting up y-axis for histogram
 
@@ -27,11 +29,8 @@ def JD_plot(mpc_code, bands):
 
     plt.hist(JD_xaxis, bins = 400, edgecolor="k", align='left', color='black')
 
-    plt.title("New Epochs found per JD")
+    plt.title("New Epochs found per MJD")
     plt.xlabel("Julian Days")
     plt.ylabel("Unique Epochs")
     plt.savefig(f"jd_plots/{mpc_code}_{bands}bands.png")
-    #plt.show()
     plt.close()
-
-#JD_plot(new_epochs, 'placeholder', mpc_code)
