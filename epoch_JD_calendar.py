@@ -24,8 +24,7 @@ def JD_plot(mpc_code, bands):
 
     
     JD_xaxis.sort()
-    for jd in JD_xaxis:
-        print(jd)
+
     plt.hist(JD_xaxis, bins = 400, edgecolor="k", align='left', color='black')
 
     plt.title("New Epochs found per JD")
