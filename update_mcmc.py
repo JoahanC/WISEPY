@@ -24,6 +24,7 @@ for neo in epoch_files:
     for band in epoch_files[neo]:
         wise_file = f"input_data/{neo}{band_lookup[band]}"
         epoch_file = f"{neo}_{band}band.txt"
-        JD_plot(neo, band)
         writeMCMC_table(epoch_file, neo, band)
+        JD_plot(neo, band)
+
         print(f"Writing MCMC input for {band} band data of {neo}.")
