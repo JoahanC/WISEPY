@@ -3,6 +3,9 @@ from mpc_wise_functions import *
 import os
 import re
 import sys
+from astropy.utils.exceptions import AstropyUserWarning
+import warnings
+
 
 
 def make_region(file, source_ids, mpc_code):
@@ -63,8 +66,6 @@ def data_sort(source_ids, mpc_code, bands=2):
             else:
                 pass
     
-    #   BUG is below
-
     for number in number_sorted:
         #print('All vals', number_sorted[number])
         regex = r"[0-9]{5}[a]"
@@ -101,8 +102,6 @@ def data_sort(source_ids, mpc_code, bands=2):
                 matches.append(test)
 
         number_sorted[number] = matches
-
-    #  BUG IS ABOVE
 
     sorted_run = []
     for number in number_sorted:
@@ -227,11 +226,28 @@ def generate_script(source_ids, lower_bound, upper_bound, mpc_code, bands=2):
     return run_string
 
 
-def terminal_table(band_file_map, bands, good_epochs):
+def terminal_table(mpc_code, band, good_epochs):
+    """
+    Generates an output table of source ids, frames indicies, and flux values,
+    for a given set of epochs and a given band set.
+    Arguments: mpc_code (str) -- the mpc designation for the asteroid
+               band (int) -- the w band being targeted
+               good_epochs (list) -- a list of valid source ids
+    Returns: None (terminal printout)
+    """
 
-    dash_string = '-' * 65 + '-' * band_file_map[bands][2]
+
+    band_file_map = {2: ("input_data/" + mpc_code + ".txt", 
+                    "input_data/" + mpc_code + ".tbl", 0),
+                    3: ("input_data/" + mpc_code + ".txt",
+                    "input_data/" + mpc_code + "_3band.tbl", 22),
+                    4: ("input_data/" + mpc_code + ".txt",
+                    "input_data/" + mpc_code + "_cryo.tbl", 44)}
+
+    # Table formatting below
+    dash_string = '-' * 65 + '-' * band_file_map[band][2]
     test_string = "| Frame | Source Id "
-    for i in range(1, int(bands) + 1):
+    for i in range(1, band + 1):
         test_string += f"|  W{i} Flux | W{i} Sigma "
     test_string += '|'
     print(dash_string)
@@ -240,25 +256,39 @@ def terminal_table(band_file_map, bands, good_epochs):
     for idx, epoch in enumerate(good_epochs):
         epoch_string = '|' + f"{idx * 2 + 1}-{idx * 2 + 2}".rjust(6)
         epoch_string += f" | {epoch}"
-        for i in range(int(bands) * 2):
+        for i in range(int(band) * 2):
             epoch_string += ' | ' + f"{good_epochs[epoch][4 + i]}".rjust(8) 
         epoch_string += " | "
         print(epoch_string)
     print(dash_string)
 
 
-def write_epochs(wise_file, epoch_file, mpc_code, bands):
+def writeMCMC_table(sid_file, mpc_code, band):
+    """
+    Generates an ipac format table from an existing WISE table for a set
+    cluster of images from the IRSA WISE Image Service.
+    Arguments: sid_file (str) -- the file name of the desired source ids
+               mpc_code (str) -- the mpc code of the asteroid being observed
+               band (str) -- the band being observed for the set of source ids
+    Returns: None (returns new tbl files in mcmc_inputs)
+    """
+    
+    warnings.simplefilter('ignore', category=AstropyUserWarning)
 
+    # Reads in all WISE source ids for a given asteroid and band set
+    band_lookup = {'2': ".tbl", '3': "_3band.tbl", '4': "_cryo.tbl"}
+    wise_file = f"input_data/{mpc_code}{band_lookup[band]}"
     data_object = Table.read(wise_file, format='ipac')
-    sids = list(data_object['source_id'])
-    sids = [sid[0:9] for sid in sids]
-    file_stubs = []
-    with open(f"loader_data/{epoch_file}", 'r') as file:
+    wise_sids = list(data_object['source_id'])
+    wise_sids = [sid[0:9] for sid in wise_sids]
+
+    # Reads in unique source ids
+    unique_sids = []
+    with open(f"loader_data/{sid_file}", 'r') as file:
         for line in file:
-            file_stubs.append(line.rstrip())
-    data_object = data_object.group_by('source_id')
-    mask = np.isin(sids, file_stubs)
-    print(data_object.groups[mask])
-    dat = data_object.groups[mask]
-    dat.write(f"mcmc_inputs/{mpc_code}_{bands}bands.tbl", 
+            unique_sids.append(line.rstrip())
+    # Generates a mask with unique source ids and writes tbl file
+    mask = np.isin(wise_sids, unique_sids)
+    t_new = data_object[mask]
+    t_new.write(f"mcmc_inputs/{mpc_code}_{band}bands.tbl", 
           format="ipac", overwrite=True)

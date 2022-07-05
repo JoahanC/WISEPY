@@ -1,8 +1,11 @@
-from ds9_interface_functions import write_epochs
-
-import os
-
+"""
+This file implements a script for generating input tables compatible with
+tbl2MCMCin.py to be eventually used in Ned's MCMC model.
+"""
+from ds9_interface_functions import writeMCMC_table
 from epoch_JD_calendar import JD_plot
+import warnings
+import os
 
 
 files = os.listdir("loader_data")
@@ -22,4 +25,5 @@ for neo in epoch_files:
         wise_file = f"input_data/{neo}{band_lookup[band]}"
         epoch_file = f"{neo}_{band}band.txt"
         JD_plot(neo, band)
-        write_epochs(wise_file, epoch_file, neo, band)
+        writeMCMC_table(epoch_file, neo, band)
+        print(f"Writing MCMC input for {band} band data of {neo}.")

@@ -47,14 +47,14 @@ def load_files(load_file, mpc_code, bands=2):
             for i in range(1, 3):
                 w_sorted.append(pair[i])
 
-    band_file_map = {'2': ("input_data/" + mpc_code + ".txt", 
+    band_file_map = {2: ("input_data/" + mpc_code + ".txt", 
                     "input_data/" + mpc_code + ".tbl", 0),
-                    '3': ("input_data/" + mpc_code + ".txt",
+                    3: ("input_data/" + mpc_code + ".txt",
                     "input_data/" + mpc_code + "_3band.tbl", 22),
-                    '4': ("input_data/" + mpc_code + ".txt",
+                    4: ("input_data/" + mpc_code + ".txt",
                     "input_data/" + mpc_code + "_cryo.tbl", 44)}
 
-    mpc_file, wise_file = band_file_map[str(bands)][0], band_file_map[str(bands)][1]
+    mpc_file, wise_file = band_file_map[bands][0], band_file_map[bands][1]
 
     new_epochs = comparer(mpc_file, wise_file, False, bands)
     good_epochs = {}
@@ -65,7 +65,7 @@ def load_files(load_file, mpc_code, bands=2):
                 good_epochs[sid] = new_epochs[epoch]
                 good_epochs[sid][0] = epoch    
   
-    terminal_table(band_file_map, str(bands), good_epochs)
+    terminal_table(mpc_file, bands, good_epochs)
     
     region_list = []
     for file in w_sorted:
