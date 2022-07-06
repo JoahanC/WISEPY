@@ -13,7 +13,7 @@ def JD_plot(mpc_code, bands):
 
     mpc_file = "input_data/" + mpc_code + ".txt"
     #wise_file = "input_data/" + mpc_code + ".tbl"
-    wise_file = f"mcmc_inputs/{mpc_code}_{bands}bands.tbl"
+    wise_file = f"ne_inputs/{mpc_code}_{bands}bands.tbl"
     #print(wise_file)
     new_epochs = comparer(mpc_file, wise_file, False)
 
@@ -27,10 +27,10 @@ def JD_plot(mpc_code, bands):
     
     JD_xaxis.sort()
 
-    plt.hist(JD_xaxis, bins = 400, edgecolor="k", align='left', color='black')
+    plt.hist(JD_xaxis, bins=np.arange(min(JD_xaxis), max(JD_xaxis) + 1, 1), edgecolor="k", align='left', color='black')
 
     plt.title("New Epochs found per MJD")
     plt.xlabel("Julian Days")
     plt.ylabel("Unique Epochs")
-    plt.savefig(f"jd_plots/{mpc_code}_{bands}band.png")
+    plt.savefig(f"mjd_plots/{mpc_code}_{bands}band.png")
     plt.close()

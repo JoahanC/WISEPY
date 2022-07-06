@@ -263,7 +263,7 @@ def terminal_table(mpc_code, band, good_epochs):
     print(dash_string)
 
 
-def writeMCMC_table(sid_file, mpc_code, band):
+def writeMCMC_table(sid_file, mpc_code, band, ne=True):
     """
     Generates an ipac format table from an existing WISE table for a set
     cluster of images from the IRSA WISE Image Service.
@@ -290,5 +290,9 @@ def writeMCMC_table(sid_file, mpc_code, band):
     # Generates a mask with unique source ids and writes tbl file
     mask = np.isin(wise_sids, unique_sids)
     t_new = data_object[mask]
-    t_new.write(f"mcmc_inputs/{mpc_code}_{band}bands.tbl", 
-          format="ipac", overwrite=True)
+    if ne:
+        t_new.write(f"ne_inputs/{mpc_code}_{band}bands.tbl", 
+            format="ipac", overwrite=True)
+    else:
+        t_new.write(f"mcmc_inputs/{mpc_code}_{band}bands.tbl", 
+            format="ipac", overwrite=True)
