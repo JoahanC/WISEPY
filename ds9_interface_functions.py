@@ -3,6 +3,7 @@ from mpc_wise_functions import *
 import os
 import re
 import sys
+from astropy.time import Time, TimeDelta
 from astropy.utils.exceptions import AstropyUserWarning
 import warnings
 
@@ -296,3 +297,100 @@ def writeMCMC_table(sid_file, mpc_code, band, ne=True):
     else:
         t_new.write(f"mcmc_inputs/{mpc_code}_{band}bands.tbl", 
             format="ipac", overwrite=True)
+
+
+def return_new_sids(band, mpc_code):
+    """
+    Generates an ipac format table from an existing WISE table for a set
+    cluster of images from the IRSA WISE Image Service.
+    Arguments: sid_file (str) -- the file name of the desired source ids
+               mpc_code (str) -- the mpc code of the asteroid being observed
+               band (str) -- the band being observed for the set of source ids
+    Returns: None (returns new tbl files in mcmc_inputs)
+    """
+    
+    warnings.simplefilter('ignore', category=AstropyUserWarning)
+
+    # Reads in all WISE source ids for a given asteroid and band set
+    new_sids = []
+    try:
+        wise_file = f"ne_inputs/{mpc_code}_{band}bands.tbl"
+        data_object = Table.read(wise_file, format='ipac')
+        sids = list(data_object['source_id'])
+        sids = [sid[0:9] for sid in sids]
+        new_sids.extend(sids)
+    except:
+        print('')
+    return new_sids
+
+
+def generate_full_table(band, mpc_code):
+
+    warnings.simplefilter('ignore', category=AstropyUserWarning)
+
+    # Reads in all known WISE observations
+    band_lookup = {'2': ".tbl", '3': "_3band.tbl", '4': "_cryo.tbl"}
+    listy = []
+    wise_file = f"input_data/{mpc_code}{band_lookup[band]}"
+    try:
+        listy.append(WISE_parser(wise_file, int(band)))
+    except:
+        print('')
+    
+    wise_obs = {}
+    for dict in listy:
+        for date in dict:
+            wise_obs[date] = dict[date]
+
+    # Read in all known MPC observations
+    mpc_file = "input_data/" + mpc_code + ".txt"
+    mpc_obs = MPC_parser(mpc_file)
+    reported_obs = {}
+    for date in mpc_obs:
+        if mpc_obs[date][0][7:] == "C51":
+            reported_obs[date] = mpc_obs[date]
+
+    # Acquire utc dates
+    wise_utc = list(wise_obs.keys())
+    mpc_utc = list(mpc_obs.keys())
+    
+    mpc_intervals = {}
+    utc_delta = TimeDelta("11.0", format='sec')
+    for datum in mpc_utc:
+        base_time = Time(datum, format='isot')
+        lower_bound = base_time - utc_delta
+        upper_bound = base_time + utc_delta
+        mpc_intervals[datum] = [lower_bound.jd, upper_bound.jd]
+
+    wise_intervals = {}
+    for datum in wise_utc:
+        base_time = Time(datum, format='isot')
+        wise_intervals[datum] = [base_time.jd]
+
+    existing_epochs = {}
+    for epoch in wise_intervals:
+        recorded = False
+        for observation in mpc_intervals:
+            if wise_intervals[epoch] >= mpc_intervals[observation][0] and wise_intervals[epoch] <= mpc_intervals[observation][1]:
+                recorded = True
+        if recorded:
+            existing_epochs[epoch] = wise_obs[epoch]
+
+    existing_sids = []
+    for epoch in existing_epochs:
+        existing_sids.append(existing_epochs[epoch][0][:9])
+
+    new_sids = return_new_sids(band, mpc_code)
+    print(new_sids)
+    all_sids = existing_sids + new_sids
+
+    band_lookup = {'2': ".tbl", '3': "_3band.tbl", '4': "_cryo.tbl"}
+    wise_file = f"input_data/{mpc_code}{band_lookup[band]}"
+    data_object = Table.read(wise_file, format='ipac')
+    wise_sids = list(data_object['source_id'])
+    wise_sids = [sid[0:9] for sid in wise_sids]
+    mask = np.isin(wise_sids, all_sids)
+    t_new = data_object[mask]
+    t_new.write(f"mcmc_inputs/{mpc_code}_{band}bands.tbl", 
+            format="ipac", overwrite=True)
+    
