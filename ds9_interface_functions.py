@@ -37,14 +37,15 @@ def data_sort(source_ids, mpc_code, bands=2):
              provided.
     """
     
+    # Generate all relevant keys and perform initial sort
     files = os.listdir("wise_images/" + mpc_code + '/')
-    to_run = []
+    wise_files = []
     for file in files:
         if file[:9] in source_ids:
-            to_run.append(file)
+            wise_files.append(file)
 
     file_id = {}
-    for file in to_run:
+    for file in wise_files:
         if file == ".DS_Store" or file == ".DS_S":
             pass
         if int(file[:5]) in file_id.keys():
@@ -55,10 +56,10 @@ def data_sort(source_ids, mpc_code, bands=2):
     key_sort = list(file_id.keys())
     key_sort.sort()
 
-
+    # Sky region sort
     number_sorted = {}
     for key in key_sort:
-        for file in to_run:
+        for file in wise_files:
             code = int(file[0:5])
             if code == key and code in number_sorted.keys():
                 number_sorted[code].append(file)
@@ -68,7 +69,6 @@ def data_sort(source_ids, mpc_code, bands=2):
                 pass
     
     for number in number_sorted:
-        #print('All vals', number_sorted[number])
         regex = r"[0-9]{5}[a]"
         matches = []
         for test in number_sorted[number]:
@@ -76,7 +76,6 @@ def data_sort(source_ids, mpc_code, bands=2):
                 pass
             else:
                 matches.append(test)
-        #print('matches', matches)
         regex = r"[0-9]{5}[b]"
         for test in number_sorted[number]:
             if len(re.findall(regex, test)) == 0:
