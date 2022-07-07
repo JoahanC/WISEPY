@@ -4,10 +4,16 @@ import sys
 from mpc_wise_functions import *
 import matplotlib.pyplot as plt
 import numpy as np
+from astropy.utils.exceptions import AstropyUserWarning
+import warnings
 from astropy.time import Time
 
 
-def JD_plot(mpc_code, bands):
+def mjd_plot(mpc_code, bands):
+    
+    warnings.simplefilter('ignore', category=AstropyUserWarning)
+    warnings.simplefilter('ignore', category=UserWarning)    
+
     #Setting up x-axis for histogram
     #band_lookup = {'2': "", '3': "_3band.tbl", '4': "_cryo.tbl"}
 

@@ -5,6 +5,7 @@ from astropy.table import Table
 import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
+from matplotlib.ticker import MaxNLocator
 from numpy import source
 
 
@@ -255,21 +256,26 @@ def generate_source_ids_dict(mpc_file, wise_file, bands):
 
 def flux_scatter(mpc_code, band):
     new_data = Table.read(f"ne_inputs/{mpc_code}_{band}bands.tbl", format='ipac')
-    mjd_new = new_data['mjd']
-    w1_new = new_data['w1flux']
-    w2_new = new_data['w2flux']
-    snr1_new = new_data["w1snr"]
-    snr2_new = new_data["w2snr"]
+    mjd_new = list(new_data['mjd'])
+    w1_new = list(new_data['w1flux'])
+    w2_new = list(new_data['w2flux'])
+    snr1_new = list(new_data["w1snr"])
+    snr2_new = list(new_data["w2snr"])
 
     all_data = Table.read(f"mcmc_inputs/{mpc_code}_{band}bands.tbl", format='ipac')
-    mjd_all = all_data['mjd']
-    w1_all = all_data['w1flux']
-    w2_all = all_data['w2flux']
-    snr1_all = all_data["w1snr"]
-    snr2_all = all_data["w2snr"]
+    mjd_all = list(all_data['mjd'])
+    w1_all = list(all_data['w1flux'])
+    w2_all = list(all_data['w2flux'])
+    snr1_all = list(all_data["w1snr"])
+    snr2_all = list(all_data["w2snr"])
 
-    plt.scatter(mjd_all, w1_all, label='All W1')
-    plt.scatter(mjd_new, w1_new, label='New W1')
+    for i in range(len(mjd_new)):
+        mjd_new[i] = int(mjd_new[i])
+    for i in range(len(mjd_all)):
+        mjd_all[i] = int(mjd_all[i])
+
+    plt.scatter(mjd_all, w1_all, label='All W2', marker=".", color="black")
+    plt.scatter(mjd_new, w1_new, label='New W2', marker=".", color="red")
     plt.title("Recorded flux epochs")
     plt.xlabel("Modified Julian Days")
     plt.ylabel("Flux")
@@ -277,8 +283,8 @@ def flux_scatter(mpc_code, band):
     plt.savefig(f"flux_plot/{mpc_code}_W1.png")
     plt.clf()
 
-    plt.scatter(mjd_all, w2_all, label='All W2')
-    plt.scatter(mjd_new, w2_new, label='New W2')
+    plt.scatter(mjd_all, w2_all, label='All W2', marker=".", color="black")
+    plt.scatter(mjd_new, w2_new, label='New W2', marker=".", color="red")
     plt.title("Recorded flux epochs")
     plt.xlabel("Modified Julian Days")
     plt.ylabel("Flux")
@@ -286,8 +292,8 @@ def flux_scatter(mpc_code, band):
     plt.savefig(f"flux_plot/{mpc_code}_W2.png")
     plt.clf()
 
-    plt.scatter(mjd_all, snr1_all, label='All SNR; W1')
-    plt.scatter(mjd_new, snr1_new, label='New SNR; W1')
+    plt.scatter(mjd_all, snr1_all, label='All SNR; W1', marker=".", color="black")
+    plt.scatter(mjd_new, snr1_new, label='New SNR; W1', marker=".", color="red")
     plt.title("Recorded flux epochs")
     plt.xlabel("Modified Julian Days")
     plt.ylabel("Flux")
@@ -295,13 +301,13 @@ def flux_scatter(mpc_code, band):
     plt.savefig(f"snr_plot/{mpc_code}_W1.png")
     plt.clf()
 
-    plt.scatter(mjd_all, snr2_all, label='All SNR; W2')
-    plt.scatter(mjd_new, snr2_new, label='New SNR; W2')
+    plt.scatter(mjd_all, snr2_all, label='All SNR; W2', marker=".", color="black")
+    plt.scatter(mjd_new, snr2_new, label='New SNR; W2', marker=".", color="red")
     plt.title("Recorded flux epochs")
     plt.xlabel("Modified Julian Days")
     plt.ylabel("Flux")
     plt.legend()
-    plt.savefig(f"snr_plot/{mpc_code}_W1.png")
+    plt.savefig(f"snr_plot/{mpc_code}_W2.png")
     plt.clf()
 
 

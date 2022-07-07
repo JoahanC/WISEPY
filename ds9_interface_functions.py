@@ -292,7 +292,7 @@ def writeMCMC_table(sid_file, mpc_code, band, ne=True):
     mask = np.isin(wise_sids, unique_sids)
     t_new = data_object[mask]
     if ne:
-        t_new.write(f"ne_inputs/{mpc_code}_{band}bands.tbl", 
+        t_new.write(f"new_inputs/{mpc_code}_{band}bands.tbl", 
             format="ipac", overwrite=True)
     else:
         t_new.write(f"mcmc_inputs/{mpc_code}_{band}bands.tbl", 
@@ -314,7 +314,7 @@ def return_new_sids(band, mpc_code):
     # Reads in all WISE source ids for a given asteroid and band set
     new_sids = []
     try:
-        wise_file = f"ne_inputs/{mpc_code}_{band}bands.tbl"
+        wise_file = f"new_inputs/{mpc_code}_{band}bands.tbl"
         data_object = Table.read(wise_file, format='ipac')
         sids = list(data_object['source_id'])
         sids = [sid[0:9] for sid in sids]
@@ -381,7 +381,6 @@ def generate_full_table(band, mpc_code):
         existing_sids.append(existing_epochs[epoch][0][:9])
 
     new_sids = return_new_sids(band, mpc_code)
-    print(new_sids)
     all_sids = existing_sids + new_sids
 
     band_lookup = {'2': ".tbl", '3': "_3band.tbl", '4': "_cryo.tbl"}
