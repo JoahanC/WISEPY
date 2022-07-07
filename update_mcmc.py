@@ -3,6 +3,7 @@ This file implements a script for generating input tables compatible with
 tbl2MCMCin.py to be eventually used in Ned's MCMC model.
 """
 from ds9_interface_functions import writeMCMC_table, generate_full_table
+from mpc_wise_functions import flux_scatter
 from epoch_JD_calendar import JD_plot
 import warnings
 import os
@@ -27,4 +28,5 @@ for neo in epoch_files:
         writeMCMC_table(epoch_file, neo, band)
         JD_plot(neo, band)
         generate_full_table(band, neo)
+        flux_scatter(neo, band)
         print(f"Writing MCMC input for {band} band data of {neo}.")
