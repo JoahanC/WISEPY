@@ -273,9 +273,20 @@ def flux_scatter(mpc_code, band):
     snr1_all = list(all_data["w1snr"])
     snr2_all = list(all_data["w2snr"])
 
+<<<<<<< Updated upstream
     plt.errorbar(mjd_all, w1_all, label='Previous W1', marker=".", color="black", yerr=w1_error_all, fmt='o')
     plt.errorbar(mjd_new, w1_new, label='New W1', marker=".", color="red", yerr=w1_error_new, fmt='o')
     plt.title(f"All Recorded Fluxes: {mpc_code}")
+=======
+    for i in range(len(mjd_new)):
+        mjd_new[i] = float(mjd_new[i])
+    for i in range(len(mjd_all)):
+        mjd_all[i] = float(mjd_all[i])
+
+    plt.scatter(mjd_all, w1_all, label='All W2', marker=".", color="black")
+    plt.scatter(mjd_new, w1_new, label='New W2', marker=".", color="red")
+    plt.title("Recorded flux epochs")
+>>>>>>> Stashed changes
     plt.xlabel("Modified Julian Days")
     plt.ylabel("Flux")
     plt.legend()
@@ -311,7 +322,7 @@ def flux_scatter(mpc_code, band):
     plt.scatter(mjd_new, snr1_new, label='New W1', marker=".", color="red")
     plt.title(f"All Recorded SNRs: {mpc_code}")
     plt.xlabel("Modified Julian Days")
-    plt.ylabel("Flux")
+    plt.ylabel("SNR")
     plt.legend()
     plt.savefig(f"snr_plot/{mpc_code}_W1.png")
     plt.clf()
@@ -328,7 +339,7 @@ def flux_scatter(mpc_code, band):
     plt.scatter(mjd_new, snr2_new, label='New W2', marker=".", color="red")
     plt.title(f"All Recorded SNRs: {mpc_code}")
     plt.xlabel("Modified Julian Days")
-    plt.ylabel("Flux")
+    plt.ylabel("SNR")
     plt.legend()
     plt.savefig(f"snr_plot/{mpc_code}_W2.png")
     plt.clf()
