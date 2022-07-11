@@ -205,7 +205,7 @@ def generate_script(source_ids, lower_bound, upper_bound, mpc_code, bands=2):
         mpc_file = "input_data/" + mpc_code + ".txt"
         wise_file = "input_data/" + mpc_code + "_cryo.tbl"
 
-    lookup_table = generate_source_ids_dict(mpc_file, wise_file, bands)
+    lookup_table = generate_ra_dec(mpc_code, bands)
 
     for file in sorted_files:
         sid = file[13 + len(mpc_code):22 + len(mpc_code)]
@@ -332,7 +332,7 @@ def generate_full_table(band, mpc_code):
     listy = []
     wise_file = f"input_data/{mpc_code}{band_lookup[band]}"
     try:
-        listy.append(WISE_parser(wise_file, int(band)))
+        listy.append(WISE_parser(mpc_code, int(band)))
     except:
         print('')
     

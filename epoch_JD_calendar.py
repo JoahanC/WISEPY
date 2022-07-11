@@ -21,7 +21,7 @@ def mjd_plot(mpc_code, bands):
     #wise_file = "input_data/" + mpc_code + ".tbl"
     wise_file = f"new_inputs/{mpc_code}_{bands}bands.tbl"
     #print(wise_file)
-    new_epochs = comparer(mpc_file, wise_file, False)
+    new_epochs = comparer(mpc_code, bands, False)
 
     JD_xaxis = []
     for epoch in new_epochs:

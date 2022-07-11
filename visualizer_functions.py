@@ -53,7 +53,7 @@ def month_plot(dates, title, title_year):
         plt.close()
 
 
-def visualizer(mpc_file, wise_file, clear_dir):
+def visualizer(mpc_code, bands, clear_dir):
     """
     Generates a series of histograms of monthly epochs across the various 
     years spanned by the MPC and WISE datasets of a given object.
@@ -65,10 +65,11 @@ def visualizer(mpc_file, wise_file, clear_dir):
             mpc_wise_functions.py
     """
 
-    unique_epochs = comparer(mpc_file, wise_file, True)
+    mpc_file, wise_file = return_input_files(mpc_code, bands)
+    unique_epochs = comparer(mpc_code, bands, True)
 
-    mpc_data = list(MPC_parser(mpc_file).keys())
-    wise_data = list(WISE_parser(wise_file).keys())
+    mpc_data = list(MPC_parser(mpc_code).keys())
+    wise_data = list(WISE_parser(mpc_code, bands).keys())
     unique_data = list(unique_epochs.keys())
 
     if clear_dir:

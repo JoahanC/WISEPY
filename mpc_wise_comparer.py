@@ -3,11 +3,11 @@ from mpc_wise_functions import *
 import sys
 
 
-mpc_file = "input_data/" + sys.argv[1] + ".txt"
-wise_file = "input_data/" + sys.argv[1] + ".tbl"
+#mpc_file = "input_data/" + sys.argv[1] + ".txt"
+#wise_file = "input_data/" + sys.argv[1] + ".tbl"
 
-new_epochs = comparer(mpc_file, wise_file, False)
-visualizer(mpc_file, wise_file, sys.argv[2])
+#new_epochs = comparer(mpc_file, wise_file, False)
+visualizer('161989', 2, True)
 
 #print("GATOR source id query string:")
 #sid_string = "source_id in ("

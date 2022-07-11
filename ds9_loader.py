@@ -56,7 +56,7 @@ def load_files(load_file, mpc_code, bands=2):
 
     mpc_file, wise_file = band_file_map[bands][0], band_file_map[bands][1]
 
-    new_epochs = comparer(mpc_file, wise_file, False, bands)
+    new_epochs = comparer(mpc_code, bands, False)
     good_epochs = {}
     for epoch in new_epochs:
         sid = new_epochs[epoch][0][:9]

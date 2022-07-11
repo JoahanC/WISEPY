@@ -18,7 +18,7 @@ for file in files:
         else:
             epoch_files[mpc_code] = [file[:len(file)-8][-1:]]
 
-band_lookup = {'2': ".tbl", '3': "_3band.tbl", '4': "_cryo.tbl"}
+band_lookup = {2: ".tbl", 3: "_3band.tbl", 4: "_cryo.tbl"}
 
 for neo in epoch_files:
     for band in epoch_files[neo]:

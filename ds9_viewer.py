@@ -16,7 +16,7 @@ if int(sys.argv[2]) == 4:
     mpc_file = "input_data/" + sys.argv[1] + ".txt"
     wise_file = "input_data/" + sys.argv[1] + "_cryo.tbl"
 
-source_ids = generate_source_ids_list(mpc_file, wise_file, int(sys.argv[2]))
+source_ids = generate_source_ids_list(sys.argv[1], int(sys.argv[2]))
 view_all = input(f"There are {len(source_ids)} unique epochs detected.\n"
                  + "Would you like to look at all of them? [Y]/[N]\n")
 if view_all.capitalize() == 'Y':

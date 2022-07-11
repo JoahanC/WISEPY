@@ -1,48 +1,24 @@
 import csv 
-import math
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
 from astropy.time import Time, TimeDelta
 from astropy.table import Table
-import matplotlib.pyplot as plt
-import pandas as pd
-import numpy as np
-from matplotlib.ticker import MaxNLocator
-from numpy import source
+from helpers import *
 
 
-def decimal_day_converter(dec_day):
-    """
-    Turns a decimal day interpretation into a UTC format.
-    Parameters: dec_day (str) -- a representation of a fractional day; ie. 0.5,
-    0.90, 0.03, 0.11214, etc. 
-    Returns: (str) a day interpretation in the format: 'HH:MM:SS'
-    """
-
-    hour_remainder = float(dec_day) * 24
-    hours = math.floor(hour_remainder)
-    hours_str = str(hours).zfill(2)
-    
-    min_remainder = (hour_remainder - hours) * 60
-    mins = math.floor(min_remainder)
-    mins_str = str(mins).zfill(2)
-    
-    sec_remainder = (min_remainder - mins) * 60
-    secs = sec_remainder
-    secs_str = str(secs).zfill(2)
-    
-    return 'T' + hours_str + ':' + mins_str + ':' + secs_str
-
-
-def MPC_parser(mpc_file):
+def MPC_parser(mpc_code):
     """
     Parses a txt file containing MPC data that returns utc and jd time values.
     
-    Arguments: mpc_file (str) -- a path to the data file to read from.
+    Arguments: mpc_code (str) -- The MPC designated code for the object
+    
     Returns: (dict) -- the keys correspond to the utc date for each observation,
     a list is returned for each key where [0] corresponds to the observation code
     and [1] corresponds to the julian date.
     """
 
-    read_file = pd.read_csv(mpc_file)
+    read_file = pd.read_csv(return_input_files(mpc_code)[0])
     read_file.to_csv('generated_data/mpc_file.csv', index=None)
     csv_url = 'generated_data/mpc_file.csv'
     dates = []
@@ -77,8 +53,15 @@ def MPC_parser(mpc_file):
     return observations
 
 
-def pull_bands(data_object, bands):
+def pull_fluxes(data_object, bands):
+    """
+    Pulls all flux values and flux sigmas for a given object.
+
+    Arguments: data_object (Table) -- the data for a given object.
+               bands (int) -- the bands included in the object data
     
+    Returns: (tuple) -- All relevant flux values for the inputted data
+    """
     w1_flux = list(data_object['w1flux'])
     w1_flux_sigma = list(data_object['w1sigflux'])
     w2_flux = list(data_object['w2flux'])
@@ -103,24 +86,26 @@ def pull_bands(data_object, bands):
                w4_flux, w4_flux_sigma)
 
 
-def WISE_parser(wise_file, bands=2):
+def WISE_parser(mpc_code, bands=2):
     """
     Parses a tbl file containing WISE image data that returns source ids, utc,
     and jd time values.
     
-    Arguments: wise_file (str) -- a path to the data file to read from.
+    Arguments: mpc_code (str) -- The MPC designated code for the object
+               bands (int) -- The targeted band set
+    
     Returns: (dict) -- the keys correspond to the utc dates for each image,
     a list is returned for each key where [0] corresponds to source_id, [1]
     corresponds to julian dates, [2] corresponds to the ra, and [3] corresponds
     to nthe dec
     """
 
-    data_object = Table.read(wise_file, format='ipac')
+    data_object = Table.read(return_input_files(mpc_code)[1], format='ipac')
     dates = list(data_object['mjd'])
     source_ids = list(data_object['source_id'])
     ra = list(data_object['ra'])
     dec = list(data_object['dec'])
-    fluxes = pull_bands(data_object, bands)
+    fluxes = pull_fluxes(data_object, bands)
     
     time_object = Time(dates, format='mjd', scale='utc')
     julian_dates = time_object.jd
@@ -148,25 +133,21 @@ def WISE_parser(wise_file, bands=2):
                                 fluxes[6][idx], fluxes[7][idx]]
     return images
 
-def n_round(x, n=5):
-    """
-    Rounds a float to the nearest n integer.
-    Arguments: x (float) -- the number being rounded.
-               n (int) -- the number being rounded to.
-    Returns: (int) -- the rounded integer.
-    """
-    return n * round(x/n)
 
-
-def comparer(mpc_file, wise_file, stats, bands=2):
+def comparer(mpc_code, bands=2, show_stats=False):
     """
-    Compares the observational instances between the MPC and WISE dataset files for a given object. 
+    Compares the observational instances between the MPC and WISE dataset 
+    files for a given object. 
+    
     Arguments: mpc_file (str) -- txt file which contains MPC data
                wise_file (str) -- file which contains WISE
+    
+    Returns: A dictionary containing all unique instances sorted by utc
+    time with assorted information.
     """
     
-    mpc_observation_data = MPC_parser(mpc_file)
-    wise_image_data = WISE_parser(wise_file, bands)
+    mpc_observation_data = MPC_parser(mpc_code)
+    wise_image_data = WISE_parser(mpc_code, bands)
     
     # Year Counting
     wise_years = []
@@ -214,7 +195,7 @@ def comparer(mpc_file, wise_file, stats, bands=2):
         if not recorded:
             new_epochs[epoch] = wise_image_data[epoch]
 
-    if stats:
+    if show_stats:
         print("Epochs observed in the MPC database:", len(mpc_observation_data))
         print("Epochs observed in the WISE database:", len(wise_image_data))
         print("Years in which MPC data was collected: " + mpc_years_str[:-2])
@@ -229,21 +210,35 @@ def comparer(mpc_file, wise_file, stats, bands=2):
     return new_epochs
 
 
-def generate_source_ids_list(mpc_file, wise_file, bands):
+def generate_source_ids_list(mpc_code, bands):
     """
-    Generates a list of unique source_ids
+    Generates a list of unique source_ids for a given object
+
+    Arguments: mpc_code (str) -- The MPC designated code for the object
+               bands (int) -- The targeted band set
+
+    Returns: (list) -- A list of all unique source ids
     """
-    new_epochs = comparer(mpc_file, wise_file, False, bands)
+    new_epochs = comparer(mpc_code, bands, False)
     source_ids = []
     for epoch in new_epochs:
         source_ids.append(new_epochs[epoch][0][:9])
     return source_ids
 
-def generate_source_ids_dict(mpc_file, wise_file, bands):
-    new_epochs = comparer(mpc_file, wise_file, False, bands)
-    wise_data = WISE_parser(wise_file)
+def generate_ra_dec(mpc_code, bands):
+    """
+    Generates a dictionary of unique epochs sorted by source id and 
+    containing the RA and DEC for the detected object in the corresponding
+    FITS file.
 
-    data_object = Table.read(wise_file, format='ipac')
+    Arguments: mpc_code (str) -- The MPC designated code for the object
+               bands (int) -- The targeted band set
+
+    Returns: (dict) -- A dictionary of source_ids with the ids being the keys,
+             the ra values[0], and the dec values[1]
+    """
+
+    data_object = Table.read(return_input_files(mpc_code, bands)[1], format='ipac')
     source_ids_2 = list(data_object['source_id'])
     ra = list(data_object['ra'])
     dec = list(data_object['dec'])
@@ -254,7 +249,16 @@ def generate_source_ids_dict(mpc_file, wise_file, bands):
     return info
 
 
-def flux_scatter(mpc_code, band):
+def generate_flux_snr_plots(mpc_code, band):
+    """
+    Generates a series of flux and SNR plots with associated error bars
+    for a given MPC object and its targeted bandset.
+
+    Arguments: mpc_code (str) -- The MPC designated code for the object
+               bands (int) -- The targeted band set
+
+    Returns: (None) -- A series of plots in /flux_plot and /snr_plot
+    """
     new_data = Table.read(f"new_inputs/{mpc_code}_{band}bands.tbl", format='ipac')
     mjd_new = list(new_data['mjd'])
     w1_new = list(new_data['w1flux'])
