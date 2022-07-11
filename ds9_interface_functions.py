@@ -2,11 +2,10 @@
 from mpc_wise_functions import *
 import os
 import re
-import sys
+import warnings
 from astropy.time import Time, TimeDelta
 from astropy.utils.exceptions import AstropyUserWarning
-import warnings
-
+from terminal_helpers import terminal_table
 
 
 def make_region(file, source_ids, mpc_code):
@@ -188,22 +187,11 @@ def generate_script(source_ids, lower_bound, upper_bound, mpc_code, bands=2):
                upperbound (int) - the ending index to load from the ids
     Returns: (str) - a set of ds9 commands to run in the terminal
     """
-    print(len(source_ids))
+    
     sorted_files = data_sort(source_ids, mpc_code, bands)
-    print(len(sorted_files))
     region_files = os.listdir("regions")
     for file in region_files:
         os.remove("regions/" + file)
-
-    if bands == 2:
-        mpc_file = "input_data/" + mpc_code + ".txt"
-        wise_file = "input_data/" + mpc_code + ".tbl"
-    if bands == 3:
-        mpc_file = "input_data/" + mpc_code + ".txt"
-        wise_file = "input_data/" + mpc_code + "_3band.tbl"
-    if bands == 4:
-        mpc_file = "input_data/" + mpc_code + ".txt"
-        wise_file = "input_data/" + mpc_code + "_cryo.tbl"
 
     lookup_table = generate_ra_dec(mpc_code, bands)
 
@@ -224,43 +212,6 @@ def generate_script(source_ids, lower_bound, upper_bound, mpc_code, bands=2):
         run_string += reg_string + ' '
     run_string += ' -zmax'
     return run_string
-
-
-def terminal_table(mpc_code, band, good_epochs):
-    """
-    Generates an output table of source ids, frames indicies, and flux values,
-    for a given set of epochs and a given band set.
-    Arguments: mpc_code (str) -- the mpc designation for the asteroid
-               band (int) -- the w band being targeted
-               good_epochs (list) -- a list of valid source ids
-    Returns: None (terminal printout)
-    """
-
-
-    band_file_map = {2: ("input_data/" + mpc_code + ".txt", 
-                    "input_data/" + mpc_code + ".tbl", 0),
-                    3: ("input_data/" + mpc_code + ".txt",
-                    "input_data/" + mpc_code + "_3band.tbl", 22),
-                    4: ("input_data/" + mpc_code + ".txt",
-                    "input_data/" + mpc_code + "_cryo.tbl", 44)}
-
-    # Table formatting below
-    dash_string = '-' * 65 + '-' * band_file_map[band][2]
-    test_string = "| Frame | Source Id "
-    for i in range(1, band + 1):
-        test_string += f"|  W{i} Flux | W{i} Sigma "
-    test_string += '|'
-    print(dash_string)
-    print(test_string)
-    print(dash_string)
-    for idx, epoch in enumerate(good_epochs):
-        epoch_string = '|' + f"{idx * 2 + 1}-{idx * 2 + 2}".rjust(6)
-        epoch_string += f" | {epoch}"
-        for i in range(int(band) * 2):
-            epoch_string += ' | ' + f"{good_epochs[epoch][4 + i]}".rjust(8) 
-        epoch_string += " | "
-        print(epoch_string)
-    print(dash_string)
 
 
 def writeMCMC_table(sid_file, mpc_code, band, ne=True):
@@ -391,4 +342,85 @@ def generate_full_table(band, mpc_code):
     t_new = data_object[mask]
     t_new.write(f"mcmc_inputs/{mpc_code}_{band}bands.tbl", 
             format="ipac", overwrite=True)
+
+
+def load_files(load_file, mpc_code, bands=2):
+    file_stubs = []
+    with open(f"loader_data/{load_file}", 'r') as file:
+        for line in file:
+            file_stubs.append(line.rstrip())
+
+    wise_files = os.listdir(f"wise_images/{mpc_code}")
+    sorted_run = []
+    for stub in file_stubs:
+        for file in wise_files:
+            if file[:9] == stub:
+                sorted_run.append(file)
+
+    if bands == 4:
+        idx = list(range(len(sorted_run)))[::4]
+        w_sorted = []
+        for i in idx:
+            quartet = {int(sorted_run[i][11]) : sorted_run[i], 
+               int(sorted_run[i+1][11]): sorted_run[i+1], 
+               int(sorted_run[i+2][11]): sorted_run[i+2], 
+               int(sorted_run[i+3][11]): sorted_run[i+3]}
+            for i in range(1, 5):
+                w_sorted.append(quartet[i])
+
+    if bands == 3:
+        idx = list(range(len(sorted_run)))[::3]
+        w_sorted = []
+        for i in idx:
+            triplet = {int(sorted_run[i][11]) : sorted_run[i], 
+               int(sorted_run[i+1][11]): sorted_run[i+1], 
+               int(sorted_run[i+2][11]): sorted_run[i+2]}
+            for i in range(1, 4):
+                w_sorted.append(triplet[i])
+
+    if bands == 2:
+        idx = list(range(len(sorted_run)))[::2]
+        w_sorted = []
+        for i in idx:
+            pair = {int(sorted_run[i][11]) : sorted_run[i], 
+               int(sorted_run[i+1][11]): sorted_run[i+1]}
+            for i in range(1, 3):
+                w_sorted.append(pair[i])
+
+    band_file_map = {2: ("input_data/" + mpc_code + ".txt", 
+                    "input_data/" + mpc_code + ".tbl", 0),
+                    3: ("input_data/" + mpc_code + ".txt",
+                    "input_data/" + mpc_code + "_3band.tbl", 22),
+                    4: ("input_data/" + mpc_code + ".txt",
+                    "input_data/" + mpc_code + "_cryo.tbl", 44)}
+
+    mpc_file, wise_file = band_file_map[bands][0], band_file_map[bands][1]
+
+    new_epochs = comparer(mpc_code, bands, False)
+    good_epochs = {}
+    for epoch in new_epochs:
+        sid = new_epochs[epoch][0][:9]
+        for stub in file_stubs:
+            if stub == sid:
+                good_epochs[sid] = new_epochs[epoch]
+                good_epochs[sid][0] = epoch    
+  
+    terminal_table(mpc_file, bands, good_epochs)
     
+    region_list = []
+    for file in w_sorted:
+        region_list.append(f"wise_images/{mpc_code}/" + file)
+
+    region_files = os.listdir("regions")
+    for file in region_files:
+        os.remove("regions/" + file)
+    lookup_table = generate_ra_dec(mpc_code, bands)
+    for file in region_list:
+        make_region(file, lookup_table, mpc_code)
+
+    ds9_script = "ds9 -tile "
+    for file in w_sorted:
+        sid, w_band = file[:9], file[10:12]
+        ds9_script += f"wise_images/{mpc_code}/" + file + ' -regions '
+        ds9_script += f"regions/{sid}_{w_band}.reg "
+    os.popen(ds9_script)

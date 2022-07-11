@@ -225,6 +225,7 @@ def generate_source_ids_list(mpc_code, bands):
         source_ids.append(new_epochs[epoch][0][:9])
     return source_ids
 
+
 def generate_ra_dec(mpc_code, bands):
     """
     Generates a dictionary of unique epochs sorted by source id and 
