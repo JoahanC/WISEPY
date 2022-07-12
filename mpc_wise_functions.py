@@ -100,7 +100,7 @@ def WISE_parser(mpc_code, bands=2):
     to nthe dec
     """
 
-    data_object = Table.read(return_input_files(mpc_code)[1], format='ipac')
+    data_object = Table.read(return_input_files(mpc_code, bands)[1], format='ipac')
     dates = list(data_object['mjd'])
     source_ids = list(data_object['source_id'])
     ra = list(data_object['ra'])

@@ -8,7 +8,7 @@ from astropy.utils.exceptions import AstropyUserWarning
 from terminal_helpers import terminal_table
 
 
-def make_region(file, source_ids, mpc_code):
+def make_region(mpc_code, fits_file, source_ids):
     """
     Makes a region file for a given .fits file in the regions folder.
     Arguments: file (str) -- the .fits file
@@ -16,8 +16,8 @@ def make_region(file, source_ids, mpc_code):
                source_ids (dict) -- the source_id lookup table
     Returns: None (file in regions folder)
     """
-    sid = file[13 + len(mpc_code):22 + len(mpc_code)]
-    band = file[23 + len(mpc_code):25 + len(mpc_code)]
+    sid = fits_file[13 + len(mpc_code):22 + len(mpc_code)]
+    band = fits_file[23 + len(mpc_code):25 + len(mpc_code)]
     with open(f"regions/{sid}_{band}.reg", 'w') as file:
         file.write("# Region file format: DS9 version 4.1\n")
         file.write('global color=green dashlist=8 3 width=1 ' 
@@ -31,7 +31,9 @@ def make_region(file, source_ids, mpc_code):
 def data_sort(source_ids, mpc_code, bands=2):
     """
     The sorting algorithm for a given object's dataset.
+    
     Arguments: source_ids (list) - a list of all unique epoch source ids.
+    
     Returns: (list) - a sorted list of files corresponding to the source ids
              provided.
     """
@@ -128,58 +130,24 @@ def data_sort(source_ids, mpc_code, bands=2):
             for elem in b_temp[key]:
                 sorted_run.append(elem)
 
-    # W band sort
-    if bands == 4:
-        idx = list(range(len(sorted_run)))[::4]
-        w_sorted = []
-        for i in idx:
-            quartet = {int(sorted_run[i][11]) : sorted_run[i], 
-               int(sorted_run[i+1][11]): sorted_run[i+1], 
-               int(sorted_run[i+2][11]): sorted_run[i+2], 
-               int(sorted_run[i+3][11]): sorted_run[i+3]}
-            for i in range(1, 5):
-                w_sorted.append(quartet[i])
+    # Test W band sort
 
-        # Renaming files to correct directory
-        renamed_sorted_run = []
-        for file in w_sorted:
-            renamed_sorted_run.append("wise_images/" + mpc_code + '/' + file)
-        return renamed_sorted_run
-    
-    if bands == 3:
-        idx = list(range(len(sorted_run)))[::3]
-        w_sorted = []
-        for i in idx:
-            triplet = {int(sorted_run[i][11]) : sorted_run[i], 
-               int(sorted_run[i+1][11]): sorted_run[i+1], 
-               int(sorted_run[i+2][11]): sorted_run[i+2]}
-            for i in range(1, 4):
-                w_sorted.append(triplet[i])
+    idx = list(range(len(sorted_run)))[::bands]
+    w_sorted = []
+    interval = {}
+    for i in idx:
+        for j in range(bands):
+            interval[int(sorted_run[i + j][11])] = sorted_run[i + j]
+        for k in range(1, bands + 1):
+            w_sorted.append(interval[k])
 
-        # Renaming files to correct directory
-        renamed_sorted_run = []
-        for file in w_sorted:
-            renamed_sorted_run.append("wise_images/" + mpc_code + '/' + file)
-
-        return renamed_sorted_run
-
-    if bands == 2:
-        idx = list(range(len(sorted_run)))[::2]
-        w_sorted = []
-        for i in idx:
-            pair = {int(sorted_run[i][11]) : sorted_run[i], 
-               int(sorted_run[i+1][11]): sorted_run[i+1]}
-            for i in range(1, 3):
-                w_sorted.append(pair[i])
-        # Renaming files to correct directory
-        renamed_sorted_run = []
-        for file in w_sorted:
-            renamed_sorted_run.append("wise_images/" + mpc_code + '/' + file)
-
-        return renamed_sorted_run
+    renamed_sorted_run = []
+    for file in w_sorted:
+        renamed_sorted_run.append("wise_images/" + mpc_code + '/' + file)
+    return renamed_sorted_run
 
 
-def generate_script(source_ids, lower_bound, upper_bound, mpc_code, bands=2):
+def generate_script(mpc_code, bands, lower_bound, upper_bound):
     """
     Generates the ds9 script for running ds9_viewer.py.
     Arguments: source_ids (list) - A list of all relevant source ids to run
@@ -187,7 +155,8 @@ def generate_script(source_ids, lower_bound, upper_bound, mpc_code, bands=2):
                upperbound (int) - the ending index to load from the ids
     Returns: (str) - a set of ds9 commands to run in the terminal
     """
-    
+
+    source_ids = generate_source_ids_list(mpc_code, bands)
     sorted_files = data_sort(source_ids, mpc_code, bands)
     region_files = os.listdir("regions")
     for file in region_files:
@@ -197,7 +166,7 @@ def generate_script(source_ids, lower_bound, upper_bound, mpc_code, bands=2):
 
     for file in sorted_files:
         sid = file[13 + len(mpc_code):22 + len(mpc_code)]
-        make_region(file, lookup_table, mpc_code)
+        make_region(mpc_code, file, lookup_table)
 
     file_region = {}
     for file in sorted_files:
@@ -214,7 +183,7 @@ def generate_script(source_ids, lower_bound, upper_bound, mpc_code, bands=2):
     return run_string
 
 
-def writeMCMC_table(sid_file, mpc_code, band, ne=True):
+def generate_new_table(sid_file, mpc_code, band):
     """
     Generates an ipac format table from an existing WISE table for a set
     cluster of images from the IRSA WISE Image Service.
@@ -241,11 +210,7 @@ def writeMCMC_table(sid_file, mpc_code, band, ne=True):
     # Generates a mask with unique source ids and writes tbl file
     mask = np.isin(wise_sids, unique_sids)
     t_new = data_object[mask]
-    if ne:
-        t_new.write(f"new_inputs/{mpc_code}_{band}bands.tbl", 
-            format="ipac", overwrite=True)
-    else:
-        t_new.write(f"mcmc_inputs/{mpc_code}_{band}bands.tbl", 
+    t_new.write(f"new_inputs/{mpc_code}_{band}bands.tbl", 
             format="ipac", overwrite=True)
 
 
@@ -274,8 +239,16 @@ def return_new_sids(band, mpc_code):
     return new_sids
 
 
-def generate_full_table(band, mpc_code):
+def generate_full_table(mpc_code, band):
+    """
+    Generates a TBL file containing all useful WISE observational instances
+    which are useful for thermophysical modeling.
 
+    Arguments: mpc_code (str) -- The MPC designated code for the object
+               bands (int) -- The targeted band set
+
+    Returns: (None) -- A new TBL file in /mcmc_inputs
+    """
     warnings.simplefilter('ignore', category=AstropyUserWarning)
 
     # Reads in all known WISE observations
@@ -416,7 +389,7 @@ def load_files(load_file, mpc_code, bands=2):
         os.remove("regions/" + file)
     lookup_table = generate_ra_dec(mpc_code, bands)
     for file in region_list:
-        make_region(file, lookup_table, mpc_code)
+        make_region(mpc_code, file, lookup_table)
 
     ds9_script = "ds9 -tile "
     for file in w_sorted:
