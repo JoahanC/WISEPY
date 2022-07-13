@@ -1,0 +1,104 @@
+\ Cont.  = '<= 5.87610763448673319e-10d) and A.scan_id_u=B.scan_id and
+\ A.frame_num_u=B.frame_num '
+\ cntr_u
+\ ___ entry counter (key) number (unique within table)
+\ ra (deg)
+\ ___ right ascension (J2000)
+\ dec (deg)
+\ ___ declination (J2000)
+\ sigra (arcsec)
+\ ___ uncertainty in RA
+\ sigdec (arcsec)
+\ ___ uncertainty in DEC
+\ sigradec (arcsec)
+\ ___ uncertainty cross-term
+\ source_id
+\ ___ unique source ID (scan ID, frame num, and source number)
+\ w1mpro (mag)
+\ ___ instrumental profile-fit photometry magnitude, band 1
+\ w1sigmpro (mag)
+\ ___ instrumental profile-fit photometry flux uncertainty in mag units, band 1
+\ w1snr
+\ ___ instrumental profile-fit photometry S/N ratio, band 1
+\ w1rchi2
+\ ___ instrumental profile-fit photometry reduced chi^2, band 1
+\ w2mpro (mag)
+\ ___ instrumental profile-fit photometry magnitude, band 2
+\ w2sigmpro (mag)
+\ ___ instrumental profile-fit photometry flux uncertainty in mag units, band 2
+\ w2snr
+\ ___ instrumental profile-fit photometry S/N ratio, band 2
+\ w2rchi2
+\ ___ instrumental profile-fit photometry reduced chi^2, band 2
+\ w3mpro (mag)
+\ ___ instrumental profile-fit photometry magnitude, band 3
+\ w3sigmpro (mag)
+\ ___ instrumental profile-fit photometry flux uncertainty in mag units, band 3
+\ w3snr
+\ ___ instrumental profile-fit photometry S/N ratio, band 3
+\ w3rchi2
+\ ___ instrumental profile-fit photometry reduced chi^2, band 3
+\ nb
+\ ___ number of blend components used in each fit
+\ na
+\ ___ active deblend flag (=1 if actively deblended)
+\ w3exptime (sec)
+\ ___ frame exposure time, band 3
+\ cc_flags
+\ ___ prioritized artifacts affecting the source in each band
+\ ph_qual
+\ ___ photometric quality of each band (A=highest, U=upper limit)
+\ sso_flg
+\ ___ known solar system object association flag (0=no association,
+\ >0=association)
+\ mjd (mjdate)
+\ ___ modified Julian date of the mid-point of the observation of the frame
+\ w1flux (dn)
+\ ___ profile-fit photometry raw flux, band 1
+\ w1sigflux (dn)
+\ ___ profile-fit photometry raw flux uncertainty, band 1
+\ w2flux (dn)
+\ ___ profile-fit photometry raw flux, band 2
+\ w2sigflux (dn)
+\ ___ profile-fit photometry raw flux uncertainty, band 2
+\ w3flux (dn)
+\ ___ profile-fit photometry raw flux, band 3
+\ w3sigflux (dn)
+\ ___ profile-fit photometry raw flux uncertainty, band 3
+\ tmass_key
+\ ___ closest associated 2MASS All-Sky Release PSC key
+\ j_m_2mass (mag)
+\ ___ J magnitude entry of the associated 2MASS All-Sky PSC source
+\ j_msig_2mass (mag)
+\ ___ J photometric uncertainty of the associated 2MASS All-Sky PSC source
+\ h_m_2mass (mag)
+\ ___ H magnitude entry of the associated 2MASS All-Sky PSC source
+\ h_msig_2mass (mag)
+\ ___ H photometric uncertainty of the associated 2MASS All-Sky PSC source
+\ k_m_2mass (mag)
+\ ___ Ks magnitude entry of the associated 2MASS All-Sky PSC source
+\ k_msig_2mass (mag)
+\ ___ Ks photometric uncertainty of the associated 2MASS All-Sky PSC source
+\fixlen='T'
+\RowsRetrieved=10
+\ORIGIN='IPAC Infrared Science Archive (IRSA), Caltech/JPL'
+\SIMULATED_TABLE='n'
+\DATETIME='2022-06-28 15:04:19'
+\DataTag='ADS/IRSA.Gator#2022/0628/150419_14214'
+\DATABASE='WISE 3-Band Cryo Single Exposure (L1b) Source Table (allsky_3band_p1bs_psd)'
+\EQUINOX='J2000'
+\NOTE="Column names with suffix _u are from the moving object seed list file .Column cntr_u is a sequential counter added to ID each row in the moving object seed list .dist is the distance in arcsec between each moving object source and its potential match in the WISE 3-Band Cryo Single Exposure (L1b) Source Table.'pang is position angle, measured eastward from north, between the input source and potential match in the WISE 3-Band Cryo Single Exposure (L1b) Source Table.Output rows are ordered by increasing cntr_u, and for each cntr_u by increasing dist."
+\StatusFile='/workspace/TMP_0tE5sv_23011/Gator/irsa/14214/log.14214.html'
+\SQL='WHERE  (A.cntr_u = B.cntr_x) and (((B.x-A.x_u)*(B.x-A.x_u)+(B.y-A.y_u)*(B.y-A.y_u)+(B.z-A.z_u)*(B.z-A.z_u))SELECT (38 column names follow in next row.)'
+|cntr_u|  dist_x|    pang_x|     ra_u|    dec_u|        ra|       dec| sigra|sigdec|sigradec|       source_id|w1mpro|w1sigmpro| w1snr|w1rchi2|w2mpro|w2sigmpro| w2snr|w2rchi2|w3mpro|w3sigmpro| w3snr|w3rchi2|  nb|  na|w3exptime|cc_flags|ph_qual|sso_flg|         mjd|w1flux|w1sigflux|w2flux|w2sigflux| w3flux|w3sigflux|tmass_key|j_m_2mass|j_msig_2mass|h_m_2mass|h_msig_2mass|k_m_2mass|k_msig_2mass|
+|  long|  double|    double|   double|   double|    double|    double|double|double|  double|            char|double|   double|double| double|double|   double|double| double|double|   double|double| double|long|long|   double|    char|   char|   long|      double|double|   double|double|   double| double|   double|     long|   double|      double|   double|      double|   double|      double|
+|      |  arcsec|       deg|         |         |       deg|       deg|arcsec|arcsec|  arcsec|                |   mag|      mag|      |       |   mag|      mag|      |       |   mag|      mag|      |       |    |    |      sec|        |       |       |      mjdate|    DN|       DN|    DN|       DN|     DN|       DN|         |      mag|         mag|      mag|         mag|      mag|         mag|
+|  null|    null|      null|     null|     null|      null|      null|  null|  null|    null|            null|  null|     null|  null|   null|  null|     null|  null|   null|  null|     null|  null|   null|null|null|     null|    null|   null|   null|        null|  null|     null|  null|     null|   null|     null|     null|     null|        null|     null|        null|     null|        null|
+      3  0.18267 -51.913444  53.48096 11.800794 53.4809192 11.8008253 0.0462 0.0511  -0.0144 07413b162-000135 13.584     0.046   23.8  0.7098 10.898     0.024   44.9   1.978  5.575     0.021   50.8   2.632    1    0       4.4     0000    AAAX       1 55424.778434 753.42    31.617 3261.3    72.622 21258.0    418.57      null      null         null      null         null      null         null 
+      4 0.181801   0.222118 53.444348 11.798827 53.4443482 11.7988775 0.0459 0.0514  -0.0109 07417b161-000116  13.56     0.044   24.9  0.6242 10.854     0.024   45.7   1.847  5.622     0.022   49.6   2.342    1    0       4.4     0000    AAAX       1 55424.910738 770.22    30.905 3396.4    74.338 20327.0    409.75      null      null         null      null         null      null         null 
+      5 0.162801  -7.837752 53.425957 11.797841 53.4259507 11.7978858 0.0469 0.0512   0.0083 07420a137-000112 13.527     0.047   23.0   1.375 10.853     0.026   42.4  0.8947  5.412     0.023   48.0    1.49    1    0       4.4     0000    AAAX       1 55424.976953 794.41     34.53 3398.0    80.088 24623.0    513.17      null      null         null      null         null      null         null 
+      6 0.182656 -95.428534  53.40755 11.796809 53.4074984 11.7968042 0.0481 0.0481   0.0086 07421b160-000120 13.454      0.04   27.0  0.7268 10.744     0.024   46.0   1.117   5.55     0.026   42.4   1.441    1    0       4.4     0000    AAAX       1 55425.043042  849.2    31.478 3756.7    81.694 21669.0    511.59      null      null         null      null         null      null         null 
+      9 0.263035  -9.796361 53.370565 11.794743 53.3705523  11.794815 0.0409 0.0441  -0.0133 07425b165-000114 13.502     0.042   25.9   1.409 10.783     0.022   50.2  0.9685  5.479     0.021   52.2   1.658    1    0       4.4     0000    AAAX       1 55425.175346 812.62    31.327 3626.7    72.273 23092.0    442.02      null      null         null      null         null      null         null 
+     10 0.142979 -29.696532 53.352018 11.793674 53.3519979 11.7937085 0.0494 0.0571    -0.01 07428a140-000117 13.541     0.047   23.2   0.691 10.849     0.025   43.7  0.7865  5.442     0.026   42.3   1.286    1    0       4.4     0000    AAAX       1 55425.241434 784.45    33.804 3413.6    78.061 23874.0    564.18      null      null         null      null         null      null         null 
+     12 0.378176  -19.37434 53.314753 11.791534 53.3147174 11.7916331 0.0512 0.0534   0.0125 07432a141-000132 13.514     0.043   25.1   0.708 10.813     0.025   43.1   1.144   5.53      0.03   36.8   0.596    1    0       4.4     0000    AAAX       1 55425.373738 803.91    32.057 3527.8    81.897 21976.0    597.88      null      null         null      null         null      null         null 
+     13 0.351145 -30.318469 53.277299 11.789343 53.2772487 11.7894272 0.0416 0.0441  -0.0071 07436a140-000126 13.535     0.044   24.8   1.636  10.94     0.022   49.8   1.677  5.523      0.02   55.1  0.9182    1    0       4.4     0000    AAAX       1 55425.506042 789.07     31.78 3137.7    63.006 22071.0    400.41      null      null         null      null         null      null         null 

@@ -32,11 +32,11 @@ def mjd_plot(mpc_code, bands):
 
     
     JD_xaxis.sort()
+    if len(JD_xaxis) != 0:
+        plt.hist(JD_xaxis, bins=np.arange(min(JD_xaxis), max(JD_xaxis) + 1, 1), edgecolor="k", align='left', color='black')
 
-    plt.hist(JD_xaxis, bins=np.arange(min(JD_xaxis), max(JD_xaxis) + 1, 1), edgecolor="k", align='left', color='black')
-
-    plt.title("New Epochs found per MJD")
-    plt.xlabel("Julian Days")
-    plt.ylabel("Unique Epochs")
-    plt.savefig(f"mjd_plots/{mpc_code}_{bands}band.png")
-    plt.close()
+        plt.title("New Epochs found per MJD")
+        plt.xlabel("Julian Days")
+        plt.ylabel("Unique Epochs")
+        plt.savefig(f"mjd_plots/{mpc_code}_{bands}band.png")
+        plt.close()
