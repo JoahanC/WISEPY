@@ -17,7 +17,6 @@ def MPC_parser(mpc_code):
     a list is returned for each key where [0] corresponds to the observation code
     and [1] corresponds to the julian date.
     """
-
     read_file = pd.read_csv(return_input_files(mpc_code)[0])
     read_file.to_csv('generated_data/mpc_file.csv', index=None)
     csv_url = 'generated_data/mpc_file.csv'
