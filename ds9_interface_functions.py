@@ -196,7 +196,7 @@ def generate_new_table(sid_file, mpc_code, band):
     warnings.simplefilter('ignore', category=AstropyUserWarning)
 
     # Reads in all WISE source ids for a given asteroid and band set
-    band_lookup = {'2': ".tbl", '3': "_3band.tbl", '4': "_cryo.tbl"}
+    band_lookup = {2: ".tbl", 3: "_3band.tbl", 4: "_cryo.tbl"}
     wise_file = f"input_data/{mpc_code}{band_lookup[band]}"
     data_object = Table.read(wise_file, format='ipac')
     wise_sids = list(data_object['source_id'])
@@ -252,7 +252,7 @@ def generate_full_table(mpc_code, band):
     warnings.simplefilter('ignore', category=AstropyUserWarning)
 
     # Reads in all known WISE observations
-    band_lookup = {'2': ".tbl", '3': "_3band.tbl", '4': "_cryo.tbl"}
+    band_lookup = {2: ".tbl", 3: "_3band.tbl", 4: "_cryo.tbl"}
     listy = []
     wise_file = f"input_data/{mpc_code}{band_lookup[band]}"
     try:
@@ -267,7 +267,7 @@ def generate_full_table(mpc_code, band):
 
     # Read in all known MPC observations
     mpc_file = "input_data/" + mpc_code + ".txt"
-    mpc_obs = MPC_parser(mpc_file)
+    mpc_obs = MPC_parser(mpc_code)
     reported_obs = {}
     for date in mpc_obs:
         if mpc_obs[date][0][7:] == "C51":
@@ -306,14 +306,14 @@ def generate_full_table(mpc_code, band):
     new_sids = return_new_sids(band, mpc_code)
     all_sids = existing_sids + new_sids
 
-    band_lookup = {'2': ".tbl", '3': "_3band.tbl", '4': "_cryo.tbl"}
+    band_lookup = {2: ".tbl", 3: "_3band.tbl", 4: "_cryo.tbl"}
     wise_file = f"input_data/{mpc_code}{band_lookup[band]}"
     data_object = Table.read(wise_file, format='ipac')
     wise_sids = list(data_object['source_id'])
     wise_sids = [sid[0:9] for sid in wise_sids]
     mask = np.isin(wise_sids, all_sids)
     t_new = data_object[mask]
-    t_new.write(f"mcmc_inputs/{mpc_code}_{band}bands.tbl", 
+    t_new.write(f"mcmc_inputs/irsa_{mpc_code}_{band}bands.tbl", 
             format="ipac", overwrite=True)
 
 

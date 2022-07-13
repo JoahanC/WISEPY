@@ -18,10 +18,8 @@ def return_input_files(mpc_code, bands=2):
     """
 
     band_lookup_table = {2: ".tbl", 3: "_3band.tbl", 4 : "_cryo.tbl"}
-
     mpc_file = f"input_data/{mpc_code}.txt"
     wise_file = f"input_data/{mpc_code}{band_lookup_table[bands]}"
-
     return mpc_file, wise_file
 
 
