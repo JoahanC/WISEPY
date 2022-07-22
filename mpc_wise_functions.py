@@ -281,7 +281,7 @@ def generate_flux_snr_plots(mpc_code, band):
         mjd_new[i] = float(mjd_new[i])
     for i in range(len(mjd_all)):
         mjd_all[i] = float(mjd_all[i])
-    print(len(mjd_new))
+    
     plt.errorbar(mjd_all, w1_all, label='Previous W1', marker=".", color="black", yerr=w1_error_all, fmt='o')
     if len(mjd_new) != 0:
         plt.errorbar(mjd_new, w1_new, label='New W1', marker=".", color="red", yerr=w1_error_new, fmt='o')
@@ -289,7 +289,7 @@ def generate_flux_snr_plots(mpc_code, band):
     plt.xlabel("Modified Julian Days")
     plt.ylabel("Flux")
     plt.legend()
-    plt.savefig(f"flux_plot/{mpc_code}_W1.png")
+    plt.savefig(f"flux_plot/all_{mpc_code}_W1.png")
     plt.clf()
 
     plt.errorbar(mjd_all, w2_all, label='Previous W2', marker=".", color="black", yerr=w2_error_all, fmt='o')
@@ -299,7 +299,7 @@ def generate_flux_snr_plots(mpc_code, band):
     plt.xlabel("Modified Julian Days")
     plt.ylabel("Flux")
     plt.legend()
-    plt.savefig(f"flux_plot/{mpc_code}_W2.png")
+    plt.savefig(f"flux_plot/all_{mpc_code}_W2.png")
     plt.clf()
 
     if len(mjd_new) != 0:
@@ -323,12 +323,12 @@ def generate_flux_snr_plots(mpc_code, band):
     plt.scatter(mjd_all, snr1_all, label='Previous W1', marker=".", color="black")
     if len(mjd_new) != 0:
         plt.scatter(mjd_new, snr1_new, label='New W1', marker=".", color="red")
-        plt.title(f"All Recorded SNRs: {mpc_code}")
-        plt.xlabel("Modified Julian Days")
-        plt.ylabel("SNR")
-        plt.legend()
-        plt.savefig(f"snr_plot/{mpc_code}_W1.png")
-        plt.clf()
+    plt.title(f"All Recorded SNRs: {mpc_code}")
+    plt.xlabel("Modified Julian Days")
+    plt.ylabel("SNR")
+    plt.legend()
+    plt.savefig(f"snr_plot/all_{mpc_code}_W1.png")
+    plt.clf()
 
     if len(mjd_new) != 0:
         plt.scatter(mjd_new, snr1_new, label="W1", marker=".", color="red")
@@ -342,12 +342,12 @@ def generate_flux_snr_plots(mpc_code, band):
     plt.scatter(mjd_all, snr2_all, label='Previous W2', marker=".", color="black")
     if len(mjd_new) != 0:
         plt.scatter(mjd_new, snr2_new, label='New W2', marker=".", color="red")
-        plt.title(f"All Recorded SNRs: {mpc_code}")
-        plt.xlabel("Modified Julian Days")
-        plt.ylabel("SNR")
-        plt.legend()
-        plt.savefig(f"snr_plot/{mpc_code}_W2.png")
-        plt.clf()
+    plt.title(f"All Recorded SNRs: {mpc_code}")
+    plt.xlabel("Modified Julian Days")
+    plt.ylabel("SNR")
+    plt.legend()
+    plt.savefig(f"snr_plot/all_{mpc_code}_W2.png")
+    plt.clf()
 
     if len(mjd_new) != 0:
         plt.scatter(mjd_new, snr2_new, label="W2", marker=".", color="red")
