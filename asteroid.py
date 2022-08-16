@@ -12,7 +12,7 @@ import matplotlib.pyplot as plt
 
 class Asteroid:
 
-    def __init__(self, unpacked_mpc_code, bands=[2]):
+    def __init__(self, packed_name, bands=[2]):
         """
         Constructor for the Asteroid class which represents an asteroid object with all
         associated MPC and WISE observations.
@@ -28,8 +28,7 @@ class Asteroid:
 
         """
         self.bands = bands
-        self.unpacked_mpc_code = unpacked_mpc_code
-        self.packed_name = pack_MPC_name(unpacked_mpc_code)
+        self.packed_name = str(packed_name)
         self.band_files = {}
         self.get_mpc_observations()
         self.split_wise_observations = {}
@@ -526,7 +525,7 @@ class Asteroid:
         """
         
         # Generate all relevant keys and perform initial sort
-        files = os.listdir("wise_images/" + str(self.unpacked_mpc_code) + '/')
+        files = os.listdir("wise_images/" + str(self.packed_name) + '/')
         wise_files = []
         for file in files:
             if file[:9] in source_ids:
@@ -633,7 +632,7 @@ class Asteroid:
                 w_sorted.append(interval[k])
         renamed_sorted_run = []
         for file in w_sorted:
-            renamed_sorted_run.append("wise_images/" + str(self.unpacked_mpc_code) + '/' + file)
+            renamed_sorted_run.append("wise_images/" + str(self.packed_name) + '/' + file)
         return renamed_sorted_run
 
     
@@ -654,8 +653,8 @@ class Asteroid:
         -------
         None, generates a corresponding .reg file in the /regions/ folder.
         """
-        sid = fits_file[13 + len(str(self.unpacked_mpc_code)):22 + len(str(self.unpacked_mpc_code))]
-        band = fits_file[23 + len(str(self.unpacked_mpc_code)):25 + len(str(self.unpacked_mpc_code))]
+        sid = fits_file[13 + len(str(self.packed_name)):22 + len(str(self.packed_name))]
+        band = fits_file[23 + len(str(self.packed_name)):25 + len(str(self.packed_name))]
         with open(f"regions/{sid}_{band}.reg", 'w') as file:
             file.write("# Region file format: DS9 version 4.1\n")
             file.write('global color=green dashlist=8 3 width=1 ' 
@@ -666,7 +665,7 @@ class Asteroid:
             file.write(f'circle({source_ids[sid][0]},{source_ids[sid][1]},15.000")')
 
     
-    def generate_script(self, band, lower_bound, upper_bound):
+    def generate_viewer_script(self, band, lower_bound, upper_bound):
         """
         Generates a ds9 terminal script which can be used to view a set of ds9 images 
         for the unique observations of this object.
@@ -687,9 +686,7 @@ class Asteroid:
         -------
         A string which can be run in the terminal to view a subset of ds9 images.
         """
-        print(self.source_ids[band])
         sorted_files = self.data_sort(self.source_ids[band], band)
-        print(len(sorted_files))
         region_files = os.listdir("regions")
         for file in region_files:
             os.remove("regions/" + file)
@@ -697,13 +694,13 @@ class Asteroid:
         lookup_table = self.generate_ra_dec(self.band_files[band][1])
 
         for file in sorted_files:
-            sid = file[13 + len(str(self.unpacked_mpc_code)):22 + len(str(self.unpacked_mpc_code))]
+            sid = file[13 + len(str(self.packed_name)):22 + len(str(self.packed_name))]
             self.make_region(file, lookup_table)
 
         file_region = {}
         for file in sorted_files:
-            sid = file[13 + len(str(self.unpacked_mpc_code)):22 + len(str(self.unpacked_mpc_code))]
-            band = file[23 + len(str(self.unpacked_mpc_code)):25 + len(str(self.unpacked_mpc_code))]
+            sid = file[13 + len(str(self.packed_name)):22 + len(str(self.packed_name))]
+            band = file[23 + len(str(self.packed_name)):25 + len(str(self.packed_name))]
             file_region[file] = f"regions/{sid}_{band}.reg"
 
         run_string = "ds9 -scale log -tile "
@@ -716,7 +713,7 @@ class Asteroid:
         #return run_string
 
 
-    def load_files(self, load_file, band=2):
+    def generate_loader_script(self, load_file, band=2):
         """
         Generates a ds9 terminal script which can be used to view a set of ds9 images 
         for source ids recorded in a .txt in /loader_files/
@@ -740,7 +737,7 @@ class Asteroid:
             for line in file:
                 file_stubs.append(line.rstrip())
 
-        wise_files = os.listdir(f"wise_images/{self.unpacked_mpc_code}")
+        wise_files = os.listdir(f"wise_images/{self.packed_name}")
         sorted_run = []
         for stub in file_stubs:
             for file in wise_files:
@@ -799,24 +796,56 @@ class Asteroid:
         
         region_list = []
         for file in w_sorted:
-            region_list.append(f"wise_images/{self.unpacked_mpc_code}/" + file)
+            region_list.append(f"wise_images/{self.packed_name}/" + file)
 
         region_files = os.listdir("regions")
         for file in region_files:
             os.remove("regions/" + file)
         lookup_table = {}
         for id in self.ra_dec_values[band]:
-            print('here', id)
             if id in file_stubs:
                 lookup_table[id] = self.ra_dec_values[band][id]
-        print(lookup_table)
-        print(region_list)
         for file in region_list:
             self.make_region(file, lookup_table)
 
         ds9_script = "ds9 -tile "
         for file in w_sorted:
             sid, w_band = file[:9], file[10:12]
-            ds9_script += f"wise_images/{self.unpacked_mpc_code}/" + file + ' -regions '
+            ds9_script += f"wise_images/{self.packed_name}/" + file + ' -regions '
             ds9_script += f"regions/{sid}_{w_band}.reg "
         os.popen(ds9_script)
+
+    
+    def ds9_viewer(self):
+        """
+        Allows the user to interact with an unfiltered set of unique WISE images.
+        """
+        image_string = ""
+        if 4 in self.bands:
+            image_string += "4: Cryogenic, "
+        if 3 in self.bands:
+            image_string += "3: Three Band, "
+        if 2 in self.bands:
+            image_string += "2: Reactivation, "
+        image_string = image_string[:len(image_string) - 2]
+        image_set = int(input("Which image set would you like to view? [2/3/4]\n"
+                          + "Available image sets are:\n"
+                          + image_string + '\n'))
+        if image_set not in self.bands:
+            raise ValueError("This band set is not found.")
+        lower_limit = 0
+        upper_limit = len(self.split_unique_observations[image_set]) * image_set
+        print(f"There are {upper_limit} total images for this band set.")
+        action = input("Would you like to view all .fits files for this object band set? [Y/N]\n"
+                       + "WARNING: Loading more than 150 images may lead to a crash!\n")
+        if action != 'Y' and action != 'N':
+            raise ValueError("Unrecognized response.")
+        if action == 'N':
+            print("Please do not use zero-indexing for the following prompts.")
+            lower_limit = int(input("What lower index would you like to start at?\n")) - 1
+            upper_limit = int(input("What upper index would you like to end at\n"))
+        self.generate_viewer_script(image_set, lower_limit, upper_limit)
+
+
+    def ds9_loader(self, load_file, band):
+        self.generate_loader_script(load_file, band)
