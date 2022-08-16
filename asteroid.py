@@ -28,7 +28,7 @@ class Asteroid:
             A list of the bands to be considered for this object. Each value must be an int.
 
         """
-        BAND_LOOKUP_TABLE = {2: ".tbl", 3: "_3band.tbl", 4: "_cryo.tbl"}
+        self.bands = bands
         self.unpacked_mpc_code = unpacked_mpc_code
         self.packed_name = pack_MPC_name(unpacked_mpc_code)
         self.band_files = {}
@@ -58,6 +58,13 @@ class Asteroid:
                 self.source_ids[band].append(self.split_unique_observations[band][observation][0][:9])
 
     
+    def run_comparison(self):
+        for band in self.bands:
+            self.generate_new_table(band)
+            self.generate_full_table(band)
+        self.generate_flux_snr_plots()
+
+
     def get_mpc_observations(self):
         """
         Populates the Asteroid object with all MPC observations from a .txt in the 
@@ -67,7 +74,6 @@ class Asteroid:
         
         Parameters
         ----------
-
         None
 
 
@@ -317,7 +323,7 @@ class Asteroid:
         warnings.simplefilter('ignore', category=AstropyUserWarning)
 
         # Reads in all WISE source ids for a given asteroid and band set
-        wise_file = f"input_data/{self.packed_name}{BAND_LOOKUP_TABLE[band]}"
+        wise_file = f"database_files/wise/{self.packed_name}_{band}band.tbl"
         data_object = Table.read(wise_file, format='ipac')
         wise_sids = list(data_object['source_id'])
         wise_sids = [sid[0:9] for sid in wise_sids]
@@ -424,14 +430,12 @@ class Asteroid:
         new_sids = self.return_new_sids(band)
         all_sids = existing_sids + new_sids
 
-        band_lookup = {2: ".tbl", 3: "_3band.tbl", 4: "_cryo.tbl"}
-        wise_file = f"input_data/{self.packed_name}{band_lookup[band]}"
-        data_object = Table.read(wise_file, format='ipac')
+        data_object = Table.read(self.band_files[band][1], format='ipac')
         wise_sids = list(data_object['source_id'])
         wise_sids = [sid[0:9] for sid in wise_sids]
         mask = np.isin(wise_sids, all_sids)
         t_new = data_object[mask]
-        t_new.write(f"observations/all/all_{self.packed_name}_{band}bands.tbl", 
+        t_new.write(f"observations/all/{self.packed_name}_{band}bands.tbl", 
                 format="ipac", overwrite=True)
 
 
@@ -455,7 +459,7 @@ class Asteroid:
         print(f"New epochs detected in WISE catalog: {len(self.total_unique_observations)}")
 
     
-    def generate_flux_snr_plots(self, band):
+    def generate_flux_snr_plots(self):
         """
         Generates a series of flux and SNR plots with associated error bars
         for a given MPC object and its targeted bandset.
@@ -467,9 +471,30 @@ class Asteroid:
 
         Returns
         -------
-        A series of plots in /plots/flux_plots and /plots/snr_plots.
+        A series of plots in /plots/flux_plots/ and /plots/snr_plots/.
         """
-        new_data = Table.read(f"observations/new/{self.packed_name}_{band}bands.tbl", format='ipac')
+        if self.packed_name not in os.listdir("./plots/flux_plots/"):
+            os.mkdir(f"./plots/flux_plots/{self.packed_name}")
+        if self.packed_name not in os.listdir("./plots/snr_plots/"):
+            os.mkdir(f"./plots/snr_plots/{self.packed_name}")
+        for band in self.bands:
+            new_data = Table.read(f"observations/new/{self.packed_name}_{band}bands.tbl", format="ipac")
+            mjd_new = list(new_data["mjd"])
+            new_flux_values = {}
+            for i in range(band):
+                new_flux_values[i + 1] = [list(new_data[f"w{i + 1}flux"]), list(new_data[f"w{i + 1}sigflux"])]
+            for set in new_flux_values:
+                template_new_plot(self.packed_name, mjd_new, new_flux_values[set], "Flux", set)
+            all_data = Table.read(f"observations/all/{self.packed_name}_{band}bands.tbl", format="ipac")
+            mjd_all = list(all_data["mjd"])
+            all_flux_values = {}
+            for i in range(band):
+                all_flux_values[i + 1] = [list(all_data[f"w{i + 1}flux"]), list(all_data[f"w{i + 1}sigflux"])]
+            for set in all_flux_values:
+                template_composite_plot(self.packed_name, mjd_new, mjd_all, new_flux_values[set], all_flux_values[set], "Flux", set)
+
+
+        """new_data = Table.read(f"observations/new/{self.packed_name}_{band}bands.tbl", format='ipac')
         mjd_new = list(new_data['mjd'])
         w1_new = list(new_data['w1flux'])
         w2_new = list(new_data['w2flux'])
@@ -566,7 +591,7 @@ class Asteroid:
             plt.ylabel("Flux")
             plt.legend()
             plt.savefig(f"plots/snr_plots/{self.packed_name}/new_{self.packed_name}_W2.png")
-            plt.clf()
+            plt.clf()"""
 
 
     def data_sort(self, source_ids, bands=2):
@@ -589,7 +614,6 @@ class Asteroid:
         files = os.listdir("wise_images/" + str(self.unpacked_mpc_code) + '/')
         wise_files = []
         for file in files:
-            #print(file)
             if file[:9] in source_ids:
                 wise_files.append(file)
 
@@ -838,12 +862,12 @@ class Asteroid:
                 for i in range(1, 3):
                     w_sorted.append(pair[i])
 
-        band_file_map = {2: ("input_data/" + str(self.unpacked_mpc_code) + ".txt", 
-                        "input_data/" + str(self.unpacked_mpc_code) + ".tbl", 0),
-                        3: ("input_data/" + str(self.unpacked_mpc_code) + ".txt",
-                        "input_data/" + str(self.unpacked_mpc_code) + "_3band.tbl", 22),
-                        4: ("input_data/" + str(self.unpacked_mpc_code) + ".txt",
-                        "input_data/" + str(self.unpacked_mpc_code) + "_cryo.tbl", 44)}
+        band_file_map = {2: ("input_data/" + str(self.packed_name) + ".txt", 
+                        "input_data/" + str(self.packed_name) + ".tbl", 0),
+                        3: ("input_data/" + str(self.packed_name) + ".txt",
+                        "input_data/" + str(self.packed_name) + "_3band.tbl", 22),
+                        4: ("input_data/" + str(self.packed_name) + ".txt",
+                        "input_data/" + str(self.packed_name) + "_cryo.tbl", 44)}
 
         mpc_file, wise_file = band_file_map[band][0], band_file_map[band][1]
 

@@ -3,32 +3,46 @@ This file contains many computational utility functions used
 throughout the package.
 """
 import math
+import matplotlib.pyplot as plt
+from matplotlib.ticker import MaxNLocator
+
+_mpc_hex = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
 
 
-def return_input_files(mpc_code, bands=2):
+def return_input_files(packed_name, band=2):
     """
-    Returns the valid MPC and WISE file for a given mpc object
+    Returns the valid MPC and WISE file for a given mpc object.
 
-    Arguments: mpc_code (str) -- the MPC designated code for an object
-               bands (int) -- the number of bands associated with an 
-               object
+    Parameters
+    ----------
+    mpc_code : str
+        The unpacked MPC designated code for the object.
+    
+    band : int
+        The band set being queried.
 
-    Returns: (tuple) The MPC file [0] and WISE file [1] associated with
-             the object
+    Returns
+    -------
+    The MPC file [0] and WISE file [1] associated with the object.
     """
 
-    band_lookup_table = {2: ".tbl", 3: "_3band.tbl", 4 : "_cryo.tbl"}
-    mpc_file = f"input_data/{mpc_code}.txt"
-    wise_file = f"input_data/{mpc_code}{band_lookup_table[bands]}"
+    mpc_file = f"database_files/mpc/{packed_name}.txt"
+    wise_file = f"database_files/wise/{packed_name}_{band}band.tbl"
     return mpc_file, wise_file
 
 
 def decimal_day_converter(dec_day):
     """
     Turns a decimal day interpretation into a UTC format.
-    Parameters: dec_day (str) -- a representation of a fractional day; ie. 0.5,
-    0.90, 0.03, 0.11214, etc. 
-    Returns: (str) a day interpretation in the format: 'HH:MM:SS'
+    
+    Arguments
+    ---------
+    dec_day : str
+        A representation of a fractional day; ie. 0.5, 0.90, 0.03, 0.11214, etc. 
+    
+    Returns
+    -------
+    A day interpretation in the format: 'HH:MM:SS'
     """
 
     hour_remainder = float(dec_day) * 24
@@ -49,8 +63,132 @@ def decimal_day_converter(dec_day):
 def n_round(x, n=5):
     """
     Rounds a float to the nearest n integer.
-    Arguments: x (float) -- the number being rounded.
-               n (int) -- the number being rounded to.
-    Returns: (int) -- the rounded integer.
+
+    Parameters
+    ----------
+    x : float
+        The number being rounded.
+               
+    n : int
+        The number being rounded to.
     """
     return n * round(x/n)
+
+
+def unpack_MPC_name(compact):
+    if len(compact) == 5:
+        if compact[4] == "P":
+            # Periodic comet
+            outn = "{:s}P".format(str(int(compact[0:4])))
+        elif compact[4] == "S":
+            # Natural Satellite
+            outn = compact
+        elif compact[0] == "~":
+            # Numbered object at or above 620000
+            dig1 = _mpc_hex.index(compact[1]) * (62**3)
+            dig2 = _mpc_hex.index(compact[2]) * (62**2)
+            dig3 = _mpc_hex.index(compact[3]) * 62
+            dig4 = _mpc_hex.index(compact[4])
+            num = 620000 + dig1 + dig2 + dig3 + dig4
+            outn = "({:s})".format(str(num))
+        else:
+            # Numbered object
+            outn = "({:s})".format(
+                str(_mpc_hex.index(compact[0]) * 10000 + int(compact[1:]))
+            )
+    elif len(compact) == 7:
+        # PLS object
+        if compact[0:3] in ["PLS", "T1S", "T2S", "T3S"]:
+            outn = "{:s} {:s}-{:s}".format(compact[3:], compact[0], compact[1])
+        else:
+            # Unnumbered asteroid
+            year = int(_mpc_hex.index(compact[0]) * 100) + int(compact[1:3])
+            if compact[4:6] == "00":
+                prov = "{:1s}{:1s}".format(compact[3], compact[6])
+            else:
+                prov = "{:1s}{:1s}{:d}".format(
+                    compact[3],
+                    compact[6],
+                    int(_mpc_hex.index(compact[4])) * 10 + int(compact[5]),
+                )
+            outn = "{:s} {:s}".format(str(year), prov)
+    elif len(compact) == 8:
+        # parabolic comet
+        year = _mpc_hex.index(compact[1]) * 100 + int(compact[2:4])
+        if compact[7] not in _mpc_hex[0:10]:
+            prov = "{:s}{:s}{:s}".format(
+                compact[4],
+                compact[7],
+                str(_mpc_hex.index(compact[5]) * 10 + int(compact[6])),
+            )
+            outn = "{:s}/{:s} {:s}".format(compact[0], str(year), prov)
+        else:
+            outn = "{:s}/{:s} {:s}{:s}".format(
+                compact[0], str(year), compact[4], str(int(compact[5:7]))
+            )
+    else:
+        raise NotImplementedError(
+            "This designation could not be unpacked {:s}".format(compact)
+        )
+    return outn
+
+
+def pack_MPC_name(name):
+    """
+    Converts an unpacked MPC designation to a packed MPC designation.
+
+    Parameters
+    ----------
+
+    name : int
+        An integer representation of an MPC name.
+
+    Returns
+    -------
+    A string representation of a packed MPC name.
+    """
+    if name < 100000:
+        return "%05d" % name
+
+    elif name < 620000:
+        nn = int(name / 10000.0)
+        c = _mpc_hex[nn]
+        return "{:1s}{:04d}".format(c, name - nn * 10000)
+
+    else:
+        # For numbers larger than 620,000 the MPC has defined a new packing
+        # scheme. Code by J. Masiero
+        nn = name - 620000
+        dig4 = int(nn % 62)
+        hold3 = (nn - dig4) / 62.0
+        dig3 = int(hold3 % 62)
+        hold2 = (hold3 - dig3) / 62.0
+        dig2 = int(hold2 % 62)
+        hold1 = (hold2 - dig2) / 62.0
+        dig1 = int(hold1 % 62)
+        return "~{:1s}{:1s}{:1s}{:1s}".format(
+            _mpc_hex[dig1], _mpc_hex[dig2], _mpc_hex[dig3], _mpc_hex[dig4])
+
+
+def template_new_plot(packed_name, mjd, flux_values, type, band):
+    fig, ax = plt.subplots()
+    ax.errorbar(mjd, flux_values[0], yerr=flux_values[1], color="red", fmt=".", capsize=2)
+    ax.yaxis.set_major_locator(MaxNLocator(integer=True))
+    ax.ticklabel_format(useOffset=False)
+    ax.set_xlabel("Modified Julian Days")
+    ax.set_ylabel(f"W{band} {type}")
+    ax.set_title(f"{packed_name}", loc="left")
+    fig.savefig(f"./plots/{type.lower()}_plots/{packed_name}/new_{type.lower()}_w{band}", dpi=1000)
+    plt.close(fig)
+
+def template_composite_plot(packed_name, new_mjd, all_mjd, new_flux_values, all_flux_values, type, band):
+    fig, ax = plt.subplots()
+    ax.errorbar(all_mjd, all_flux_values[0], yerr=all_flux_values[1], color="black", fmt=".", capsize=2)
+    ax.errorbar(new_mjd, new_flux_values[0], yerr=new_flux_values[1], color="red", fmt=".", capsize=2, ecolor="red")
+    ax.ticklabel_format(useOffset=False)
+    ax.yaxis.set_major_locator(MaxNLocator(integer=True))
+    ax.set_xlabel("Modified Julian Days")
+    ax.set_ylabel(f"All W{band} {type}")
+    ax.set_title(f"{packed_name}", loc="left")
+    fig.savefig(f"./plots/{type.lower()}_plots/{packed_name}/new_{type.lower()}_w{band}", dpi=1000)
+    plt.close(fig)

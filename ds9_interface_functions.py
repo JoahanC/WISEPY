@@ -210,7 +210,7 @@ def generate_new_table(sid_file, mpc_code, band):
     # Generates a mask with unique source ids and writes tbl file
     mask = np.isin(wise_sids, unique_sids)
     t_new = data_object[mask]
-    t_new.write(f"new_inputs/{mpc_code}_{band}bands.tbl", 
+    t_new.write(f"observations/new/{mpc_code}_{band}bands.tbl", 
             format="ipac", overwrite=True)
 
 

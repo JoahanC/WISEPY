@@ -11,9 +11,14 @@ def MPC_parser(mpc_code):
     """
     Parses a txt file containing MPC data that returns utc and jd time values.
     
-    Arguments: mpc_code (str) -- The MPC designated code for the object
+    Parameters
+    ----------
+    mpc_code : str
+        The MPC designated code for the object
     
-    Returns: (dict) -- the keys correspond to the utc date for each observation,
+    Returns
+    -------
+    The keys correspond to the utc date for each observation,
     a list is returned for each key where [0] corresponds to the observation code
     and [1] corresponds to the julian date.
     """
@@ -47,6 +52,7 @@ def MPC_parser(mpc_code):
     time_object = Time(utc_dates, format='isot')
     julian_dates = time_object.jd
     observations = {}
+
     for idx, date in enumerate(utc_dates):
         observations[date] = [obs_ids[idx], julian_dates[idx]]
     return observations
@@ -54,12 +60,19 @@ def MPC_parser(mpc_code):
 
 def pull_fluxes(data_object, bands):
     """
-    Pulls all flux values and flux sigmas for a given object.
+    Pulls all flux values and flux uncertainties for a given object.
 
-    Arguments: data_object (Table) -- the data for a given object.
-               bands (int) -- the bands included in the object data
+    Parameters
+    ----------
+    data_object : Table
+        The data for a given object.
     
-    Returns: (tuple) -- All relevant flux values for the inputted data
+    bands : int
+        The number of wavelength bands to be looked at.
+    
+    Returns
+    -------
+        All flux values and flux uncertainties for the number of bands requested.
     """
     w1_flux = list(data_object['w1flux'])
     w1_flux_sigma = list(data_object['w1sigflux'])
@@ -87,16 +100,23 @@ def pull_fluxes(data_object, bands):
 
 def WISE_parser(mpc_code, bands=2):
     """
-    Parses a tbl file containing WISE image data that returns source ids, utc,
-    and jd time values.
+    Parses a tbl file containing WISE image data that returns source ids, utc 
+    and jd time values, and RA and DEC values.
     
-    Arguments: mpc_code (str) -- The MPC designated code for the object
-               bands (int) -- The targeted band set
+    Parameters
+    ----------
+    mpc_code : str
+        The unpacked MPC designated code for the object.
     
-    Returns: (dict) -- the keys correspond to the utc dates for each image,
+    bands : int 
+        The number of wavelength bands to be looked at.
+    
+    Returns
+    -------
+    A dictionary where the keys correspond to the utc dates for each image,
     a list is returned for each key where [0] corresponds to source_id, [1]
-    corresponds to julian dates, [2] corresponds to the ra, and [3] corresponds
-    to nthe dec
+    corresponds to julian dates, [2] corresponds to the RA, and [3] corresponds
+    to the DEC.
     """
 
     data_object = Table.read(return_input_files(mpc_code, bands)[1], format='ipac')
@@ -213,10 +233,17 @@ def generate_source_ids_list(mpc_code, bands):
     """
     Generates a list of unique source_ids for a given object
 
-    Arguments: mpc_code (str) -- The MPC designated code for the object
-               bands (int) -- The targeted band set
+    Parameters
+    ----------
+    mpc_code : str
+        The unpacked MPC designated code for the object.
+    
+    bands : int
+        The number of wavelength bands to be looked at.
 
-    Returns: (list) -- A list of all unique source ids
+    Returns
+    -------
+    A list of all unique source ids.
     """
     new_epochs = comparer(mpc_code, bands, False)
     source_ids = []
@@ -231,13 +258,19 @@ def generate_ra_dec(mpc_code, bands):
     containing the RA and DEC for the detected object in the corresponding
     FITS file.
 
-    Arguments: mpc_code (str) -- The MPC designated code for the object
-               bands (int) -- The targeted band set
+    Parameters
+    ----------
+    mpc_code : str
+        The unpacked MPC designated code for the object.
+    
+    bands : int
+        The number of wavelength bands to be looked at.
 
-    Returns: (dict) -- A dictionary of source_ids with the ids being the keys,
-             the ra values[0], and the dec values[1]
+    Returns
+    -------
+    A dictionary of source_ids with the ids being the keys, the ra values[0], 
+    and the dec values[1]
     """
-
     data_object = Table.read(return_input_files(mpc_code, bands)[1], format='ipac')
     source_ids_2 = list(data_object['source_id'])
     ra = list(data_object['ra'])
@@ -254,10 +287,17 @@ def generate_flux_snr_plots(mpc_code, band):
     Generates a series of flux and SNR plots with associated error bars
     for a given MPC object and its targeted bandset.
 
-    Arguments: mpc_code (str) -- The MPC designated code for the object
-               bands (int) -- The targeted band set
+    Parameters
+    ----------
+    mpc_code : str
+        The unpacked MPC designated code for the object.
+    
+    bands : int
+        The number of wavelength bands to be looked at.
 
-    Returns: (None) -- A series of plots in /flux_plot and /snr_plot
+    Returns
+    -------
+    A series of plots in /flux_plot and /snr_plot.
     """
     new_data = Table.read(f"new_inputs/{mpc_code}_{band}bands.tbl", format='ipac')
     mjd_new = list(new_data['mjd'])
@@ -357,5 +397,3 @@ def generate_flux_snr_plots(mpc_code, band):
         plt.legend()
         plt.savefig(f"snr_plot/new_{mpc_code}_W2.png")
         plt.clf()
-
-

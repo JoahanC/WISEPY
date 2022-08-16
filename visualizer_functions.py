@@ -11,12 +11,22 @@ def month_plot(dates, title, title_year):
     """
     Produces a histogram of recorded epochs during a given year
     across different months.
-    Arguments: dates (list) -- a list of utc format strings 
-               title (str) -- the name of the dataset
-               title_year (str) -- the year being plotted for. If
-               a cumulative graph is made, provide the string:
-               "all years"
-    Returns: a histogram in the output folder
+
+    Parameters
+    ----------
+    dates : list
+        A list of utc format strings.
+    
+    title : str 
+        The name of the dataset.
+               
+    title_year : str
+        The year being plotted for. If a cumulative graph is made, provide the string:
+        "all years".
+    
+    Returns
+    -------
+        A histogram in the output_plots/ folder.
     """
 
     trimmed_dates = []
