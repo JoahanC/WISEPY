@@ -3,8 +3,11 @@ This file contains many computational utility functions used
 throughout the package.
 """
 import math
+import warnings
 import matplotlib.pyplot as plt
+import astropy
 from matplotlib.ticker import MaxNLocator
+
 
 _mpc_hex = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
 
@@ -170,7 +173,8 @@ def pack_MPC_name(name):
             _mpc_hex[dig1], _mpc_hex[dig2], _mpc_hex[dig3], _mpc_hex[dig4])
 
 
-def template_new_plot(packed_name, mjd, flux_values, type, band):
+def template_new_plot(packed_name, mjd, flux_values, type, band, group):
+    warnings.filterwarnings('error', module='astropy._erfa')
     fig, ax = plt.subplots()
     ax.errorbar(mjd, flux_values[0], yerr=flux_values[1], color="red", fmt=".", capsize=2)
     ax.yaxis.set_major_locator(MaxNLocator(integer=True))
@@ -178,10 +182,11 @@ def template_new_plot(packed_name, mjd, flux_values, type, band):
     ax.set_xlabel("Modified Julian Days")
     ax.set_ylabel(f"W{band} {type}")
     ax.set_title(f"{packed_name}", loc="left")
-    fig.savefig(f"./plots/{type.lower()}_plots/{packed_name}/new_{type.lower()}_w{band}", dpi=1000)
+    fig.savefig(f"./plots/{type.lower()}_plots/{packed_name}/{group}_band/new_{type.lower()}_w{band}", dpi=1000)
     plt.close(fig)
 
-def template_composite_plot(packed_name, new_mjd, all_mjd, new_flux_values, all_flux_values, type, band):
+def template_composite_plot(packed_name, new_mjd, all_mjd, new_flux_values, all_flux_values, type, band, group):
+    warnings.filterwarnings('error', module='astropy._erfa')
     fig, ax = plt.subplots()
     ax.errorbar(all_mjd, all_flux_values[0], yerr=all_flux_values[1], color="black", fmt=".", capsize=2)
     ax.errorbar(new_mjd, new_flux_values[0], yerr=new_flux_values[1], color="red", fmt=".", capsize=2, ecolor="red")
@@ -190,5 +195,5 @@ def template_composite_plot(packed_name, new_mjd, all_mjd, new_flux_values, all_
     ax.set_xlabel("Modified Julian Days")
     ax.set_ylabel(f"All W{band} {type}")
     ax.set_title(f"{packed_name}", loc="left")
-    fig.savefig(f"./plots/{type.lower()}_plots/{packed_name}/new_{type.lower()}_w{band}", dpi=1000)
+    fig.savefig(f"./plots/{type.lower()}_plots/{packed_name}/{group}_band/all_{type.lower()}_w{band}", dpi=1000)
     plt.close(fig)

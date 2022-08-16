@@ -478,20 +478,39 @@ class Asteroid:
         if self.packed_name not in os.listdir("./plots/snr_plots/"):
             os.mkdir(f"./plots/snr_plots/{self.packed_name}")
         for band in self.bands:
+            if f"{band}_band" not in os.listdir(f"./plots/flux_plots/{self.packed_name}"):
+                os.mkdir(f"./plots/flux_plots/{self.packed_name}/{band}_band")
+            if f"{band}_band" not in os.listdir(f"./plots/snr_plots/{self.packed_name}"):
+                os.mkdir(f"./plots/snr_plots/{self.packed_name}/{band}_band")
+            
             new_data = Table.read(f"observations/new/{self.packed_name}_{band}bands.tbl", format="ipac")
+            all_data = Table.read(f"observations/all/{self.packed_name}_{band}bands.tbl", format="ipac")
             mjd_new = list(new_data["mjd"])
+            mjd_all = list(all_data["mjd"])
+            
             new_flux_values = {}
             for i in range(band):
                 new_flux_values[i + 1] = [list(new_data[f"w{i + 1}flux"]), list(new_data[f"w{i + 1}sigflux"])]
             for set in new_flux_values:
-                template_new_plot(self.packed_name, mjd_new, new_flux_values[set], "Flux", set)
-            all_data = Table.read(f"observations/all/{self.packed_name}_{band}bands.tbl", format="ipac")
-            mjd_all = list(all_data["mjd"])
+                template_new_plot(self.packed_name, mjd_new, new_flux_values[set], "Flux", set, band)
+            
+            new_snr_values = {}
+            for i in range(band):
+                new_snr_values[i + 1] = [list(new_data[f"w{i + 1}snr"]), np.zeros(len(list(new_data[f"w{i + 1}snr"])))]
+            for set in new_snr_values:
+                template_new_plot(self.packed_name, mjd_new, new_snr_values[set], "SNR", set, band)
+            
             all_flux_values = {}
             for i in range(band):
                 all_flux_values[i + 1] = [list(all_data[f"w{i + 1}flux"]), list(all_data[f"w{i + 1}sigflux"])]
             for set in all_flux_values:
-                template_composite_plot(self.packed_name, mjd_new, mjd_all, new_flux_values[set], all_flux_values[set], "Flux", set)
+                template_composite_plot(self.packed_name, mjd_new, mjd_all, new_flux_values[set], all_flux_values[set], "Flux", set, band)
+
+            all_snr_values = {}
+            for i in range(band):
+                all_snr_values[i + 1] = [list(all_data[f"w{i + 1}snr"]), np.zeros(len(list(all_data[f"w{i + 1}snr"])))]
+            for set in all_snr_values:
+                template_composite_plot(self.packed_name, mjd_new, mjd_all, new_snr_values[set], all_snr_values[set], "SNR", set, band)
 
 
         """new_data = Table.read(f"observations/new/{self.packed_name}_{band}bands.tbl", format='ipac')
