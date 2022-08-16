@@ -795,7 +795,7 @@ class Asteroid:
                     good_epochs[sid] = new_epochs[epoch]
                     good_epochs[sid][0] = epoch    
     
-        #terminal_table(mpc_file, bands, good_epochs)
+        terminal_table(mpc_file, band, good_epochs)
         
         region_list = []
         for file in w_sorted:
