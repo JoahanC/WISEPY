@@ -1,7 +1,6 @@
 from helpers import *
 import os
 import re
-import csv
 import warnings
 import numpy as np
 import pandas as pd
@@ -83,17 +82,13 @@ class Asteroid:
         utc dates of each observation as the key while the observation index[0] and 
         julian dates[1] form a 2 element list for each key.
         """
-        read_file = pd.read_csv(return_input_files(self.packed_name)[0])
-        read_file.to_csv('generated_data/mpc_file.csv', index=None)
-        csv_url = 'generated_data/mpc_file.csv'
         dates = []
         ids = []
         obs_ids = []
 
-        with open(csv_url) as csvfile:
-            spamreader = csv.reader(csvfile)
-            for row in spamreader:
-                row_string = row[0]
+        with open(return_input_files(self.packed_name)[0], 'r') as mpc_file:
+            for idx, row in enumerate(mpc_file.readlines()):
+                row_string = row
                 id_string = row_string[:15] 
                 ids.append(id_string)
                 row_string = row_string[15:]
@@ -109,6 +104,7 @@ class Asteroid:
                 dates.append(date[:23])
                 observation_id = row_string[47:]
                 obs_ids.append(observation_id)
+        
         utc_dates = np.array(dates)
         time_object = Time(utc_dates, format='isot')
         julian_dates = time_object.jd
@@ -511,106 +507,6 @@ class Asteroid:
                 all_snr_values[i + 1] = [list(all_data[f"w{i + 1}snr"]), np.zeros(len(list(all_data[f"w{i + 1}snr"])))]
             for set in all_snr_values:
                 template_composite_plot(self.packed_name, mjd_new, mjd_all, new_snr_values[set], all_snr_values[set], "SNR", set, band)
-
-
-        """new_data = Table.read(f"observations/new/{self.packed_name}_{band}bands.tbl", format='ipac')
-        mjd_new = list(new_data['mjd'])
-        w1_new = list(new_data['w1flux'])
-        w2_new = list(new_data['w2flux'])
-        w1_error_new = list(new_data["w1sigflux"])
-        w2_error_new = list(new_data["w2sigflux"])
-        snr1_new = list(new_data["w1snr"])
-        snr2_new = list(new_data["w2snr"])
-
-        all_data = Table.read(f"observations/all/all_{self.packed_name}_{band}bands.tbl", format='ipac')
-        mjd_all = list(all_data['mjd'])
-        w1_all = list(all_data['w1flux'])
-        w2_all = list(all_data['w2flux'])
-        w1_error_all = list(all_data["w1sigflux"])
-        w2_error_all = list(all_data["w2sigflux"])
-        snr1_all = list(all_data["w1snr"])
-        snr2_all = list(all_data["w2snr"])
-
-        for i in range(len(mjd_new)):
-            mjd_new[i] = float(mjd_new[i])
-        for i in range(len(mjd_all)):
-            mjd_all[i] = float(mjd_all[i])
-        
-        plt.errorbar(mjd_all, w1_all, label='Previous W1', marker=".", color="black", yerr=w1_error_all, fmt='o')
-        if len(mjd_new) != 0:
-            plt.errorbar(mjd_new, w1_new, label='New W1', marker=".", color="red", yerr=w1_error_new, fmt='o')
-        plt.title("Recorded flux epochs")
-        plt.xlabel("Modified Julian Days")
-        plt.ylabel("Flux")
-        plt.legend()
-        plt.savefig(f"plots/flux_plots/{self.packed_name}/all_{self.packed_name}_W1.png")
-        plt.clf()
-
-        plt.errorbar(mjd_all, w2_all, label='Previous W2', marker=".", color="black", yerr=w2_error_all, fmt='o')
-        if len(mjd_new) != 0:
-            plt.errorbar(mjd_new, w2_new, label='New W2', marker=".", color="red", yerr=w2_error_new, fmt='o')
-        plt.title(f"All Recorded Fluxes: {self.packed_name}")
-        plt.xlabel("Modified Julian Days")
-        plt.ylabel("Flux")
-        plt.legend()
-        plt.savefig(f"plots/flux_plots/{self.packed_name}/all_{self.packed_name}_W2.png")
-        plt.clf()
-
-        if len(mjd_new) != 0:
-            plt.errorbar(mjd_new, w1_new, label='W1', marker=".", color="black", yerr=w1_error_new, fmt='o')
-            plt.title(f"New Recorded Fluxes: {self.packed_name}")
-            plt.xlabel("Modified Julian Days")
-            plt.ylabel("Flux")
-            plt.legend()
-            plt.savefig(f"plots/flux_plots/{self.packed_name}/new_{self.packed_name}_W1.png")
-            plt.clf()
-
-        if len(mjd_new) != 0:
-            plt.errorbar(mjd_new, w2_new, label='W2', marker=".", color="black", yerr=w2_error_new, fmt='o')
-            plt.title(f"New Recorded Fluxes: {self.packed_name}")
-            plt.xlabel("Modified Julian Days")
-            plt.ylabel("Flux")
-            plt.legend()
-            plt.savefig(f"plots/flux_plots/{self.packed_name}/new_{self.packed_name}_W2.png")
-            plt.clf()
-
-        plt.scatter(mjd_all, snr1_all, label='Previous W1', marker=".", color="black")
-        if len(mjd_new) != 0:
-            plt.scatter(mjd_new, snr1_new, label='New W1', marker=".", color="red")
-        plt.title(f"All Recorded SNRs: {self.packed_name}")
-        plt.xlabel("Modified Julian Days")
-        plt.ylabel("SNR")
-        plt.legend()
-        plt.savefig(f"plots/snr_plots/{self.packed_name}/all_{self.packed_name}_W1.png")
-        plt.clf()
-
-        if len(mjd_new) != 0:
-            plt.scatter(mjd_new, snr1_new, label="W1", marker=".", color="red")
-            plt.title(f"New Recorded SNRs: {self.packed_name}")
-            plt.xlabel("Modified Julian Days")
-            plt.ylabel("Flux")
-            plt.legend()
-            plt.savefig(f"plots/snr_plots/{self.packed_name}/new_{self.packed_name}_W1.png")
-            plt.clf()
-
-        plt.scatter(mjd_all, snr2_all, label='Previous W2', marker=".", color="black")
-        if len(mjd_new) != 0:
-            plt.scatter(mjd_new, snr2_new, label='New W2', marker=".", color="red")
-        plt.title(f"All Recorded SNRs: {self.packed_name}")
-        plt.xlabel("Modified Julian Days")
-        plt.ylabel("SNR")
-        plt.legend()
-        plt.savefig(f"plots/snr_plots/{self.packed_name}/all_{self.packed_name}_W2.png")
-        plt.clf()
-
-        if len(mjd_new) != 0:
-            plt.scatter(mjd_new, snr2_new, label="W2", marker=".", color="red")
-            plt.title(f"New Recorded SNRs: {self.packed_name}")
-            plt.xlabel("Modified Julian Days")
-            plt.ylabel("Flux")
-            plt.legend()
-            plt.savefig(f"plots/snr_plots/{self.packed_name}/new_{self.packed_name}_W2.png")
-            plt.clf()"""
 
 
     def data_sort(self, source_ids, bands=2):
