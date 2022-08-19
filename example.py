@@ -34,6 +34,8 @@ cacus = Asteroid("02212", [2, 4])
 First we'll run the comparison feature WISEPY possesses. To do this, simply call the
 run_comparison method. This will internally populate the asteroid object with all of
 the unique observations found in the WISE dataset relative to the MPC dataset.
+Additionally, WISEPY will generate SNR and flux plots for all detections and solely
+unique detections in the /plots/ folder.
 """
 cacus.run_comparison()
 cacus.display_unique_observations()
