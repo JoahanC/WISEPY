@@ -57,6 +57,9 @@ class Asteroid:
 
     
     def run_comparison(self):
+        """
+        Runs all of WISEPYs comparison methods.
+        """
         for band in self.bands:
             self.generate_new_table(band)
             self.generate_full_table(band)
@@ -68,13 +71,8 @@ class Asteroid:
         Populates the Asteroid object with all MPC observations from a .txt in the 
         /input_data/ directory. The file must follow the following naming scheme:
 
-        ./input_data/[[packed_MPC_name]].txt
+        ./database_files/mpc/[[packed_MPC_name]].txt
         
-        Parameters
-        ----------
-        None
-
-
         Returns
         -------
         None, populates the self.mpc_observations field with a dictionary containing the
@@ -267,10 +265,10 @@ class Asteroid:
         for year in self.mpc_years:
             mpc_years_str += str(year) + ", "
         
-        # Acquire utc dates
         wise_utc = list(self.split_wise_observations[band].keys())
         mpc_utc = list(self.mpc_observations.keys())
 
+        # Looks for wise detections in a given interval of 11 seconds
         mpc_intervals = {}
         utc_delta = TimeDelta("11.0", format='sec')
         for datum in mpc_utc:
@@ -292,7 +290,6 @@ class Asteroid:
                     recorded = True
             if not recorded:
                 new_epochs[epoch] = self.split_wise_observations[band][epoch]
-
         return new_epochs
 
 
@@ -392,7 +389,6 @@ class Asteroid:
             if self.mpc_observations[date][0][7:] == "C51":
                 reported_obs[date] = self.mpc_observations[date]
 
-        # Acquire utc dates
         wise_utc = list(wise_obs.keys())
         mpc_utc = list(self.mpc_observations.keys())
         
@@ -458,11 +454,6 @@ class Asteroid:
         """
         Generates a series of flux and SNR plots with associated error bars
         for a given MPC object and its targeted bandset.
-
-        Parameters
-        ----------
-        bands : int
-            The wavelength band being plotted.
 
         Returns
         -------
@@ -591,6 +582,7 @@ class Asteroid:
 
             number_sorted[number] = matches
 
+        # Sorting sky region sub numbers
         sorted_run = []
         for number in number_sorted:
             a_temp = {}
@@ -617,11 +609,7 @@ class Asteroid:
                 for elem in b_temp[key]:
                     sorted_run.append(elem)
 
-        #for file in sorted_run:
-        #    print(file)
-
-
-        # Test W band sort
+        # W band sort
         idx = list(range(len(sorted_run)))[::bands]
         w_sorted = []
         interval = {}
@@ -710,21 +698,15 @@ class Asteroid:
             run_string += reg_string + ' '
         run_string += ' -zmax'
         os.popen(run_string)
-        #return run_string
 
 
-    def generate_loader_script(self, load_file, band=2):
+    def generate_loader_script(self, band=2):
         """
         Generates a ds9 terminal script which can be used to view a set of ds9 images 
         for source ids recorded in a .txt in /loader_files/
         
         Parameters
         ----------
-
-        load_file : str
-            The name of a .txt file found in the /loader_data/ folder containing source id
-            stubs.
-
         band : int
             The specific band set of images to look at.
         
@@ -733,7 +715,7 @@ class Asteroid:
         A string which can be run in the terminal to view a subset of ds9 images.
         """
         file_stubs = []
-        with open(f"loader_data/{load_file}", 'r') as file:
+        with open(f"loader_data/{self.packed_name}_{band}band.txt", 'r') as file:
             for line in file:
                 file_stubs.append(line.rstrip())
 
@@ -847,5 +829,8 @@ class Asteroid:
         self.generate_viewer_script(image_set, lower_limit, upper_limit)
 
 
-    def ds9_loader(self, load_file, band):
-        self.generate_loader_script(load_file, band)
+    def ds9_loader(self, band):
+        """
+        Runs the WISEPY loader script sequence.
+        """
+        self.generate_loader_script(band)

@@ -1,5 +1,8 @@
-from asteroid import Asteroid
+"""
+This file runs WISEPY on all valid inputted asteroids.
+"""
 import os
+from asteroid import Asteroid
 
 # Runs wisepy on all current objects.
 files = os.listdir("./database_files/wise")
@@ -11,10 +14,6 @@ for file in files:
         query[packed_name] = [int(band)]
     else:
         query[packed_name].append(int(band))
-
-temp = query["G1989"]
-del query["G1989"]
-query[161989] = temp
 
 formatted_query = {}
 for name in query:

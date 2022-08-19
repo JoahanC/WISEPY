@@ -5,8 +5,6 @@ throughout the package.
 import math
 import warnings
 import matplotlib.pyplot as plt
-import astropy
-import datetime
 import numpy as np
 from matplotlib.ticker import MaxNLocator
 
@@ -175,10 +173,34 @@ def pack_MPC_name(name):
             _mpc_hex[dig1], _mpc_hex[dig2], _mpc_hex[dig3], _mpc_hex[dig4])
 
 
-def template_new_plot(packed_name, mjd, flux_values, type, band, group):
+def template_new_plot(packed_name, mjd, values, type, band, group):
+    """
+    Plotter template for either SNR or flux values.
+
+    Parameters
+    ----------
+    packed_name : str
+        The packed MPC designation for the object being plotted.
+
+    mjd : list
+        A set of mjd values corresponding to detections.
+
+    values : list
+        Either flux or SNR values for plotting.
+
+    type : str
+        Whether flux or SNR values are being plotted.
+
+    band : int
+        The wavelength band being plotted.
+
+    group : int
+        The bandset being plotted where 2 corresponds to Reactivation,
+        3 corresponds to three band, and 4 correspondings to Cryogenic
+    """
     warnings.filterwarnings('error', module='astropy._erfa')
     fig, ax = plt.subplots()
-    ax.errorbar(mjd, flux_values[0], yerr=flux_values[1], color="red", fmt=".", capsize=2)
+    ax.errorbar(mjd, values[0], yerr=values[1], color="red", fmt=".", capsize=2)
     ax.yaxis.set_major_locator(MaxNLocator(integer=True))
     ax.ticklabel_format(useOffset=False)
     ax.set_xlabel("Modified Julian Days")
@@ -187,11 +209,47 @@ def template_new_plot(packed_name, mjd, flux_values, type, band, group):
     fig.savefig(f"./plots/{type.lower()}_plots/{packed_name}/{group}_band/new_{type.lower()}_w{band}", dpi=1000)
     plt.close(fig)
 
-def template_composite_plot(packed_name, new_mjd, all_mjd, new_flux_values, all_flux_values, type, band, group):
+
+def template_composite_plot(packed_name, new_mjd, all_mjd, new_values, 
+                            all_values, type, band, group):
+    """
+    Plotter template for differentiating between new and old flux or SNR values.
+
+    Parameters
+    ----------
+    packed_name : str
+        The packed MPC designation for the object being plotted.
+
+    new_mjd : list
+        A set of mjd values corresponding to new detections.
+
+    all_mjd : list
+        A set of mjd values corresponding to all detections.
+
+    new_values : dict
+        A dictionary of either flux or snr values corresponding to new detections.
+        There should be two keys with [0] having a list of all detection values and
+        [1] having a list of all uncertainty values.
+
+    all_values : dict
+        A dictionary of either flux or snr values corresponding to all detections.
+        There should be two keys with [0] having a list of all detection values and
+        [1] having a list of all uncertainty values.
+
+    type : str
+        Whether flux or SNR values are being plotted.
+
+    band : int
+        The wavelength band being plotted.
+
+    group : int
+        The bandset being plotted where 2 corresponds to Reactivation,
+        3 corresponds to three band, and 4 correspondings to Cryogenic
+    """
     warnings.filterwarnings('error', module='astropy._erfa')
     fig, ax = plt.subplots()
-    ax.errorbar(all_mjd, all_flux_values[0], yerr=all_flux_values[1], color="black", fmt=".", capsize=2)
-    ax.errorbar(new_mjd, new_flux_values[0], yerr=new_flux_values[1], color="red", fmt=".", capsize=2, ecolor="red")
+    ax.errorbar(all_mjd, all_values[0], yerr=all_values[1], color="black", fmt=".", capsize=2)
+    ax.errorbar(new_mjd, new_values[0], yerr=new_values[1], color="red", fmt=".", capsize=2, ecolor="red")
     ax.ticklabel_format(useOffset=False)
     ax.yaxis.set_major_locator(MaxNLocator(integer=True))
     ax.set_xlabel("Modified Julian Days")
